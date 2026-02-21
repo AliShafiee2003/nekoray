@@ -1,50 +1,38 @@
-# NekoBox For PC
+# 🌟 NekoBox (Nekoray) - UI Enhanced Edition
 
-Qt based cross-platform GUI proxy configuration manager (backend: sing-box)
+> **Note:** This is an independently enhanced fork of the original [MatsuriDayo/nekoray](https://github.com/MatsuriDayo/nekoray) project (which was archived on Mar 17, 2025). This repository brings modern UI refinements and quality-of-life (QoL) improvements to the stable v3.26 core.
 
-Support Windows / Linux out of the box now.
+A Qt-based cross-platform GUI proxy configuration manager (backend: sing-box). Currently supports **Windows / Linux** out of the box.
 
-基于 Qt 的跨平台代理配置管理器 (后端 sing-box)
+---
 
-目前支持 Windows / Linux 开箱即用
+## ✨ What's New in this Modded Version?
 
-## 下载 / Download
+This fork focuses on streamlining the user experience and modernizing the interface. Key improvements over the base v3.26 include:
 
-### GitHub Releases (Portable ZIP)
+- 🧹 **Decluttered Header:** Simplified the top layout for a cleaner, distraction-free configuration panel.
+- ⚡ **Dedicated URL Test Button:** Added a prominent, interactive `Test` button with a sleek white icon in the main toolbar for lightning-fast latency checks.
+- 🔄 **Smart Auto-Sorting:** The proxy list now automatically sorts itself by ping/latency immediately after a URL test finishes. 
+- ➕ **Quick "Add Group" Actions:** Introduced a highly accessible `+` button directly next to the tab bar, making profile and group management much more intuitive.
+- 🌍 **Enhanced Footer Data:** The bottom status bar now provides rich, dynamic information about your active out-bound connection, including **Exit IP, Country Name, and Country Flag**.
+- 🎨 **Unified Design Language:** Completely fixed Qt's native rendering bugs (like disappearing borders in Windows Fusion style). Added responsive `:hover` and `:pressed` feedback loops to main buttons. The design looks exceptionally native and clean on both **Light** and **Dark** forms.
 
-便携格式，无安装器。转到 Releases 下载预编译的二进制文件，解压后即可使用。
+---
 
-[![GitHub All Releases](https://img.shields.io/github/downloads/Matsuridayo/nekoray/total?label=downloads-total&logo=github&style=flat-square)](https://github.com/Matsuridayo/nekoray/releases)
+## 📥 Download & Installation
 
-[下载 / Download](https://github.com/Matsuridayo/nekoray/releases)
+This is a portable application with no installer required. 
 
-[安装包的说明，如果你不知道要下载哪一个](https://github.com/MatsuriDayo/nekoray/wiki/Installation-package-description)
+1. Go to the [Releases](../../releases) page.
+2. Download the latest `nekoray-...-mod-release.zip` file.
+3. Extract the folder to your preferred location.
+4. Run [nekoray.exe](cci:7://file:///C:/Users/alish/Desktop/nekoray/nekoray-3.26-mod-release/nekoray.exe:0:0-0:0) to launch the client with the new interface.
 
-### Package
+> **Windows Users:** If you receive a "DLL missing" error upon execution, please download and install the [Microsoft Visual C++ Redistributable](https://learn.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist).
 
-#### AUR
+---
 
-- [nekoray](https://aur.archlinux.org/packages/nekoray)
-- [nekoray-git](https://aur.archlinux.org/packages/nekoray-git)
-
-#### archlinuxcn
-
-- [nekoray](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/nekoray)
-- [nekoray-git](https://github.com/archlinuxcn/repo/tree/master/archlinuxcn/nekoray-git)
-
-#### Scoop Extras
-
-`scoop install nekoray`
-
-## 更改记录 & 发布频道 / Changelog & Telegram Channel
-
-https://t.me/Matsuridayo
-
-## 项目主页 & 文档 / Homepage & Documents
-
-https://matsuridayo.github.io
-
-## 代理 / Proxy
+## 🌐 Supported Protocols (Proxy)
 
 - SOCKS (4/4a/5)
 - HTTP(S)
@@ -52,68 +40,26 @@ https://matsuridayo.github.io
 - VMess
 - VLESS
 - Trojan
-- TUIC ( sing-box )
-- NaïveProxy ( Custom Core )
-- Hysteria2 ( Custom Core or sing-box )
-- Custom Outbound
-- Custom Config
-- Custom Core
+- TUIC (via sing-box)
+- NaïveProxy (Custom Core)
+- Hysteria2 (Custom Core or sing-box)
+- *Custom Outbound / Custom Config / Custom Core*
 
-## 订阅 / Subscription
+### Subscriptions
+Raw support for widely used formats including Shadowsocks, Clash, and v2rayN.
 
-- Raw: some widely used formats (like Shadowsocks, Clash and v2rayN)
-- 原始格式: 一些广泛使用的格式 (如 Shadowsocks、Clash 和 v2rayN)
+---
 
-## 运行参数
+## 🛠️ Credits & Acknowledgments
 
-[运行参数](docs/RunFlags.md)
+This project stands on the shoulders of giants. Massive thanks to the original developers and the open-source community:
 
-## Windows 运行
+**Gui & Maintenance:**
+- [MatsuriDayo/nekoray](https://github.com/MatsuriDayo/nekoray) (Original Base Project)
+- Qv2ray, Qt, protobuf, yaml-cpp, zxing-cpp, QHotkey, AppImageKit
 
-若提示 DLL 缺失，无法运行，请下载 安装 [微软 C++ 运行库](https://aka.ms/vs/17/release/vc_redist.x64.exe)
-
-## Linux 运行
-
-[Linux 运行教程](docs/Run_Linux.md)
-
-## 编译教程 / Compile Tutorial
-
-请看 [技术文档 / Technical documentation](https://github.com/MatsuriDayo/nekoray/tree/main/docs)
-
-## 捐助 / Donate
-
-如果这个项目对您有帮助，可以通过捐赠的方式帮助我们维持这个项目。
-
-捐赠满等额 50 USD 可以在「[捐赠榜](https://mtrdnt.pages.dev/donation_list)」显示头像，如果您未被添加到这里，欢迎联系我们补充。
-
-Donations of 50 USD or more can display your avatar on the [Donation List](https://mtrdnt.pages.dev/donation_list). If you are not added here, please contact us to add it.
-
-USDT TRC20
-
-`TRhnA7SXE5Sap5gSG3ijxRmdYFiD4KRhPs`
-
-XMR
-
-`49bwESYQjoRL3xmvTcjZKHEKaiGywjLYVQJMUv79bXonGiyDCs8AzE3KiGW2ytTybBCpWJUvov8SjZZEGg66a4e59GXa6k5`
-
-## Credits
-
-Core:
-
-- [v2fly/v2ray-core](https://github.com/v2fly/v2ray-core) ( < 3.10 )
-- [MatsuriDayo/Matsuri](https://github.com/MatsuriDayo/Matsuri) ( < 3.10 )
-- [MatsuriDayo/v2ray-core](https://github.com/MatsuriDayo/v2ray-core) ( < 3.10 )
-- [XTLS/Xray-core](https://github.com/XTLS/Xray-core) ( 3.10 <= Version <= 3.26 )
-- [MatsuriDayo/Xray-core](https://github.com/MatsuriDayo/Xray-core) ( 3.10 <= Version <= 3.26 )
-- [SagerNet/sing-box](https://github.com/SagerNet/sing-box)
-- [Matsuridayo/sing-box-extra](https://github.com/MatsuriDayo/sing-box-extra)
-
-Gui:
-
-- [Qv2ray](https://github.com/Qv2ray/Qv2ray)
-- [Qt](https://www.qt.io/)
-- [protobuf](https://github.com/protocolbuffers/protobuf)
-- [yaml-cpp](https://github.com/jbeder/yaml-cpp)
-- [zxing-cpp](https://github.com/nu-book/zxing-cpp)
-- [QHotkey](https://github.com/Skycoder42/QHotkey)
-- [AppImageKit](https://github.com/AppImage/AppImageKit)
+**Core Engines:**
+- `SagerNet/sing-box`
+- `Matsuridayo/sing-box-extra`
+- `XTLS/Xray-core`
+- `v2fly/v2ray-core`
