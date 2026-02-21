@@ -42,7 +42,7 @@ namespace NekoGui {
         // Load Proxys
         QList<int> delProfile;
         for (auto id: profilesIdOrder) {
-            auto ent = LoadProxyEntity(QStringLiteral("profiles/%1.json").arg(id));
+            auto ent = LoadProxyEntity(QString("profiles/%1.json").arg(id));
             // Corrupted profile?
             if (ent == nullptr || ent->bean == nullptr || ent->bean->version == -114514) {
                 delProfile << id;
@@ -58,7 +58,7 @@ namespace NekoGui {
         auto loadedOrder = groupsTabOrder;
         groupsTabOrder = {};
         for (auto id: groupsIdOrder) {
-            auto ent = LoadGroup(QStringLiteral("groups/%1.json").arg(id));
+            auto ent = LoadGroup(QString("groups/%1.json").arg(id));
             // Corrupted group?
             if (ent->id != id) {
                 continue;
@@ -78,7 +78,7 @@ namespace NekoGui {
         // First setup
         if (groups.empty()) {
             auto defaultGroup = NekoGui::ProfileManager::NewGroup();
-            defaultGroup->name = QObject::tr("Default");
+            defaultGroup->name = "Default";
             NekoGui::profileManager->AddGroup(defaultGroup);
         }
         //
@@ -103,7 +103,7 @@ namespace NekoGui {
                         auto newId = i++;
                         profile->id = newId;
                         profile->gid = gidOld2New[gid];
-                        profile->fn = QStringLiteral("profiles/%1.json").arg(newId);
+                        profile->fn = QString("profiles/%1.json").arg(newId);
                         profile->Save();
                         newProfiles[newId] = profile;
                         newProfilesIdOrder << newId;
@@ -122,7 +122,7 @@ namespace NekoGui {
                     auto group = groups[oldGid];
                     QFile::remove(group->fn);
                     group->id = newId;
-                    group->fn = QStringLiteral("groups/%1.json").arg(newId);
+                    group->fn = QString("groups/%1.json").arg(newId);
                     group->Save();
                     newGroups[newId] = group;
                     newGroupsIdOrder << newId;
@@ -184,6 +184,8 @@ namespace NekoGui {
             bean = new NekoGui_fmt::TrojanVLESSBean(NekoGui_fmt::TrojanVLESSBean::proxy_VLESS);
         } else if (type == "naive") {
             bean = new NekoGui_fmt::NaiveBean();
+        } else if (type == "hysteria") {
+            bean = new NekoGui_fmt::QUICBean(NekoGui_fmt::QUICBean::proxy_Hysteria);
         } else if (type == "hysteria2") {
             bean = new NekoGui_fmt::QUICBean(NekoGui_fmt::QUICBean::proxy_Hysteria2);
         } else if (type == "tuic") {
@@ -227,7 +229,7 @@ namespace NekoGui {
         if (latency < 0) {
             return QObject::tr("Unavailable");
         } else if (latency > 0) {
-            return UNICODE_LRO + QStringLiteral("%1 ms").arg(latency);
+            return UNICODE_LRO + QString("%1 ms").arg(latency);
         } else {
             return "";
         }
@@ -268,7 +270,7 @@ namespace NekoGui {
         profiles[ent->id] = ent;
         profilesIdOrder.push_back(ent->id);
 
-        ent->fn = QStringLiteral("profiles/%1.json").arg(ent->id);
+        ent->fn = QString("profiles/%1.json").arg(ent->id);
         ent->Save();
         return true;
     }
@@ -278,7 +280,7 @@ namespace NekoGui {
         if (dataStore->started_id == id) return;
         profiles.erase(id);
         profilesIdOrder.removeAll(id);
-        QFile(QStringLiteral("profiles/%1.json").arg(id)).remove();
+        QFile(QString("profiles/%1.json").arg(id)).remove();
     }
 
     void ProfileManager::MoveProfile(const std::shared_ptr<ProxyEntity> &ent, int gid) {
@@ -342,7 +344,7 @@ namespace NekoGui {
         groupsIdOrder.push_back(ent->id);
         groupsTabOrder.push_back(ent->id);
 
-        ent->fn = QStringLiteral("groups/%1.json").arg(ent->id);
+        ent->fn = QString("groups/%1.json").arg(ent->id);
         ent->Save();
         return true;
     }
@@ -359,7 +361,7 @@ namespace NekoGui {
         groups.erase(gid);
         groupsIdOrder.removeAll(gid);
         groupsTabOrder.removeAll(gid);
-        QFile(QStringLiteral("groups/%1.json").arg(gid)).remove();
+        QFile(QString("groups/%1.json").arg(gid)).remove();
     }
 
     std::shared_ptr<Group> ProfileManager::GetGroup(int id) {

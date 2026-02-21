@@ -1,3 +1,234 @@
+/* Modern Dark Theme for Nekoray */
+
+/* Base Colors - Catppuccin Mocha inspired */
+QMainWindow,
+QDialog,
+QWidget {
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    outline: none;
+}
+
+QSplitter::handle {
+    background-color: rgba(128, 128, 128, 0.3);
+}
+
+/* ToolBar & ToolButtons */
+QToolButton {
+    border: 1px solid #7a7a85;
+    border-radius: 8px;
+    padding: 6px;
+    margin: 4px;
+    font-weight: 600;
+}
+
+QToolButton::menu-indicator {
+    image: none;
+    /* Hide default arrow to keep it clean */
+}
+
+/* Tabs */
+QTabWidget::pane {
+    border: 1px solid #7a7a85;
+    border-radius: 12px;
+}
+
+QTabBar::tab {
+    border: 1px solid #7a7a85;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    min-height: 32px;
+    padding: 6px 16px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    font-weight: bold;
+    background-color: rgba(128, 128, 128, 0.2);
+}
+
+QTabBar::tab:hover: !selected {}
+
+
+/* Add Group Button in Tab Bar */
+#btnAddGroup {
+    background-color: transparent;
+    border: 1px solid #7a7a85;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    font-size: 20px;
+    font-weight: bold;
+    color: palette(text);
+    padding: 0px;
+}
+
+#btnAddGroup:hover {
+    background-color: rgba(128, 128, 128, 0.3);
+    color: #89b4fa;
+}
+
+/* Table Widget */
+QTableWidget {
+    border: 1px solid #7a7a85;
+    border-radius: 8px;
+}
+
+QHeaderView::section {
+    background-color: transparent;
+    color: palette(text);
+    padding: 6px;
+    font-weight: bold;
+    border-style: none solid solid none;
+    /* top right bottom left */
+    border-width: 1px;
+    border-color: #7a7a85;
+}
+
+QTableWidget::item {
+    padding: 4px;
+}
+
+/* Log Browser */
+QTextBrowser#masterLogBrowser {
+    background-color: palette(base);
+    color: palette(text);
+    border: 1px solid #7a7a85;
+    border-radius: 8px;
+}
+
+/* Settings Controls */
+QCheckBox {
+    spacing: 8px;
+}
+
+QCheckBox::indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid #7a7a85;
+    background-color: rgba(128, 128, 128, 0.1);
+}
+
+QCheckBox#checkBox_VPN::indicator:checked {
+    background-color: #89b4fa;
+    border-color: #89b4fa;
+    image: none;
+    /* Solid color filled from the image */
+}
+
+QCheckBox#checkBox_SystemProxy::indicator:checked {
+    background-color: #89b4fa;
+    border-color: #89b4fa;
+    image: none;
+    /* Solid color filled */
+}
+
+QCheckBox::indicator:checked {
+    background-color: #89b4fa;
+    border-color: #89b4fa;
+    image: url(:/icon/material/done.svg);
+}
+
+QLineEdit {
+    background-color: transparent;
+    border: 1px solid #7a7a85;
+    border-radius: 6px;
+    padding: 6px 12px;
+    selection-background-color: #89b4fa;
+}
+
+QLineEdit:focus {
+    /* Let the system handle focus natively if possible, or slight color change */
+}
+
+/* Menus */
+QMenu {
+    background-color: palette(window);
+    border: 1px solid #7a7a85;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+QMenu::item {
+    padding: 6px 24px;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+QMenu::item:selected {
+    background-color: rgba(128, 128, 128, 0.3);
+    color: #89b4fa;
+}
+
+/* Removed hover as selected handles it in Qt */
+
+QToolButton#toolButton_menu,
+QToolButton#toolButton_url_test {
+    background-color: transparent;
+    border: 1px solid #7a7a85;
+    border-radius: 8px;
+    padding: 2px;
+    min-width: 64px;
+    min-height: 60px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+/* Scrollbars */
+QScrollBar:vertical {
+    border: none;
+    background: rgba(128, 128, 128, 0.05);
+    width: 10px;
+    margin: 0px 0px 0px 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: rgba(128, 128, 128, 0.3);
+    min-height: 20px;
+    border-radius: 5px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: rgba(128, 128, 128, 0.6);
+}
+
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar::add-page:vertical,
+QScrollBar::sub-page:vertical {
+    background: none;
+}
+
 QMessageBox {
-    messagebox-text-interaction-flags: 5;
+    background-color: palette(window);
+}
+
+QStatusBar {
+    background: transparent;
+    color: palette(text);
+}
+
+#footerFrame {
+    background-color: rgba(128, 128, 128, 0.05);
+    border-top: 1px solid #7a7a85;
+    border-radius: 8px;
+    margin-top: 4px;
+    padding: 2px 4px;
+}
+
+#labelConfigFlag {
+    background-color: transparent;
+    padding: 4px;
+}
+
+#labelConfigIP {
+    background-color: transparent;
+    color: #cdd6f4;
+    font-weight: bold;
+    padding: 4px 8px;
 }
