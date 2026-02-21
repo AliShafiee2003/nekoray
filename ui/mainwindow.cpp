@@ -59,6 +59,19 @@ void UI_InitMainWindow() {
     mainwindow = new MainWindow;
 }
 
+static QIcon Utils_ColorizeSvgIcon(const QString &path, const QColor &color) {
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) return QIcon(path);
+    QString svg = file.readAll();
+    file.close();
+    svg.replace("#000000", color.name(), Qt::CaseInsensitive);
+    svg.replace("#ffffff", color.name(), Qt::CaseInsensitive);
+    QPixmap pixmap;
+    pixmap.loadFromData(svg.toUtf8(), "SVG");
+    return QIcon(pixmap);
+}
+
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     mainwindow = this;
     MW_dialog_message = [=](const QString &a, const QString &b) {
@@ -129,11 +142,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     ui->toolButton_menu->setFixedSize(64, 60);
     ui->toolButton_url_test->setFixedSize(64, 60);
+    ui->toolButton_play->setFixedSize(64, 60);
     
-    ui->toolButton_menu->setIcon(QIcon(":/neko/icon/menu-9-svgrepo-com.svg"));
-    ui->toolButton_url_test->setIcon(QIcon(":/neko/icon/test-svgrepo-com.svg"));
+    auto text_color = palette().color(QPalette::Text);
+
+    ui->toolButton_menu->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/menu-9-svgrepo-com.svg", text_color));
+    ui->toolButton_url_test->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/test-svgrepo-com.svg", text_color));
+    ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/play.svg", text_color));
     ui->toolButton_menu->setCursor(Qt::PointingHandCursor);
     ui->toolButton_url_test->setCursor(Qt::PointingHandCursor);
+    ui->toolButton_play->setCursor(Qt::PointingHandCursor);
     
     QString btnStyle = 
         "QToolButton {"
@@ -155,8 +173,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         
     ui->toolButton_menu->setStyleSheet(btnStyle);
     ui->toolButton_url_test->setStyleSheet(btnStyle);
+    ui->toolButton_play->setStyleSheet(btnStyle);
 
     connect(ui->toolButton_url_test, &QToolButton::clicked, this, [=]() { speedtest_current_group(1); });
+    connect(ui->toolButton_play, &QToolButton::clicked, this, [=]() {
+        if (NekoGui::dataStore->started_id >= 0) {
+            neko_stop();
+        } else {
+            neko_start();
+        }
+    });
+
     connect(ui->menu_document, &QAction::triggered, this, [=] { QDesktopServices::openUrl(QUrl("https://matsuridayo.github.io/")); });
     connect(ui->menu_update, &QAction::triggered, this, [=] { runOnNewThread([=] { CheckUpdate(); }); });
 
@@ -539,6 +566,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     TM_auto_update_subsctiption_Reset_Minute(NekoGui::dataStore->sub_auto_update);
 
     if (!NekoGui::dataStore->flag_tray) show();
+    is_ui_ready = true;
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -995,6 +1023,14 @@ void MainWindow::refresh_status(const QString &traffic_update) {
         }
     }
 
+    if (icon_status_new != Icon::NONE) {
+        ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/pause.svg", palette().color(QPalette::Text)));
+        ui->toolButton_play->setText(tr("Stop"));
+    } else {
+        ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/play.svg", palette().color(QPalette::Text)));
+        ui->toolButton_play->setText(tr("Start"));
+    }
+
     // refresh title & window icon
     setWindowTitle(make_title(false));
     if (icon_status_new != icon_status) QApplication::setWindowIcon(Icon::GetTrayIcon(Icon::NONE));
@@ -1195,22 +1231,57 @@ void MainWindow::refresh_proxy_list_impl(const int &id, GroupSortAction groupSor
                                   if (i < 0) i = 99999;
                                   return i;
                               };
+                              auto get_full_test_score = [&get_latency_for_sort](int id, const QString& report) -> double {
+                                  double fallback = get_latency_for_sort(id);
+                                  if (report.isEmpty()) return fallback;
+                                  
+                                  double score = 0.0;
+                                  bool has_any_metric = false;
+                                  
+                                  QRegularExpressionMatch lat_match = QRegularExpression("\\bLatency:\\s*([\\d\\.]+)ms").match(report);
+                                  if (lat_match.hasMatch()) {
+                                      score += 0.40 * lat_match.captured(1).toDouble();
+                                      has_any_metric = true;
+                                  } else if (report.contains("Latency: Error") || report.contains("Latency: Timeout")) {
+                                      score += 0.40 * 10000.0;
+                                      has_any_metric = true;
+                                  } else {
+                                      score += 0.40 * fallback;
+                                  }
+                                  
+                                  QRegularExpressionMatch udp_match = QRegularExpression("\\bUDPLatency:\\s*([\\d\\.]+)ms").match(report);
+                                  if (udp_match.hasMatch()) {
+                                      score += 0.30 * udp_match.captured(1).toDouble();
+                                      has_any_metric = true;
+                                  } else if (report.contains("UDPLatency: Error") || report.contains("UDPLatency: Timeout")) {
+                                      score += 0.30 * 10000.0;
+                                      has_any_metric = true;
+                                  }
+                                  
+                                  QRegularExpressionMatch spd_match = QRegularExpression("\\bSpeed:\\s*([\\d\\.]+)MiB/s").match(report);
+                                  if (spd_match.hasMatch()) {
+                                      score -= 0.30 * spd_match.captured(1).toDouble() * 100.0;
+                                      has_any_metric = true;
+                                  } else if (report.contains("Speed: Error") || report.contains("Speed: Timeout")) {
+                                      score += 0.30 * 10000.0; 
+                                      has_any_metric = true;
+                                  }
+                                  
+                                  if (!has_any_metric) {
+                                      // If it's a raw config generator error, penalize it heavily.
+                                      return 100000.0;
+                                  }
+                                  return score;
+                              };
+
                               if (groupSortAction.descending) {
                                   if (groupSortAction.method == GroupSortMethod::ByLatency) {
-                                      if (ms_a.isEmpty() && ms_b.isEmpty()) {
-                                          // compare latency if full_test_report is empty
-                                          return get_latency_for_sort(a) > get_latency_for_sort(b);
-                                      }
+                                      return get_full_test_score(a, ms_a) > get_full_test_score(b, ms_b);
                                   }
                                   return ms_a > ms_b;
                               } else {
                                   if (groupSortAction.method == GroupSortMethod::ByLatency) {
-                                      auto int_a = NekoGui::profileManager->GetProfile(a)->latency;
-                                      auto int_b = NekoGui::profileManager->GetProfile(b)->latency;
-                                      if (ms_a.isEmpty() && ms_b.isEmpty()) {
-                                          // compare latency if full_test_report is empty
-                                          return get_latency_for_sort(a) < get_latency_for_sort(b);
-                                      }
+                                      return get_full_test_score(a, ms_a) < get_full_test_score(b, ms_b);
                                   }
                                   return ms_a < ms_b;
                               }
@@ -1671,6 +1742,18 @@ QList<std::shared_ptr<NekoGui::ProxyEntity>> MainWindow::get_selected_or_group()
         profiles = NekoGui::profileManager->CurrentGroup()->ProfilesWithOrder();
     }
     return profiles;
+}
+
+void MainWindow::changeEvent(QEvent *event) {
+    if (event->type() == QEvent::PaletteChange || event->type() == QEvent::StyleChange) {
+        if (is_ui_ready && ui && ui->toolButton_menu && ui->toolButton_url_test) {
+            auto text_color = palette().color(QPalette::Text);
+            ui->toolButton_menu->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/menu-9-svgrepo-com.svg", text_color));
+            ui->toolButton_url_test->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/test-svgrepo-com.svg", text_color));
+            refresh_status();
+        }
+    }
+    QMainWindow::changeEvent(event);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event) {

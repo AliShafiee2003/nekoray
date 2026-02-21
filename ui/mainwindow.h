@@ -135,6 +135,8 @@ private slots:
 
     void on_tabWidget_currentChanged(int index);
 
+    void on_add_group_clicked();
+
 private:
     Ui::MainWindow *ui;
     QSystemTrayIcon *tray;
@@ -160,6 +162,7 @@ private:
     QMutex mu_exit;
     QSemaphore sem_stopped;
     int exit_reason = 0;
+    bool is_ui_ready = false;
 
     QList<std::shared_ptr<NekoGui::ProxyEntity>> get_now_selected_list();
 
@@ -175,6 +178,8 @@ private:
 
     void closeEvent(QCloseEvent *event) override;
 
+    void changeEvent(QEvent *event) override;
+
     //
 
     void HotkeyEvent(const QString &key);
@@ -185,7 +190,7 @@ private:
 
     static void setup_grpc();
 
-    void speedtest_current_group(int mode, bool test_group);
+    void speedtest_current_group(int mode);
 
     void speedtest_current();
 
