@@ -58,14 +58,8 @@ void MainWindow::setup_grpc() {
 inline bool speedtesting = false;
 inline QList<QThread *> speedtesting_threads = {};
 
-void MainWindow::speedtest_current_group(int mode, bool test_group) {
-    if (speedtesting) {
-        MessageBoxWarning(software_name, QObject::tr("The last speed test did not exit completely, please wait. If it persists, please restart the program."));
-        return;
-    }
-
+void MainWindow::speedtest_current_group(int mode, bool bypass_dialog) {
     auto profiles = get_selected_or_group();
-    if (test_group) profiles = NekoGui::profileManager->CurrentGroup()->ProfilesWithOrder();
     if (profiles.isEmpty()) return;
     auto group = NekoGui::profileManager->CurrentGroup();
     if (group->archive) return;
@@ -81,39 +75,48 @@ void MainWindow::speedtest_current_group(int mode, bool test_group) {
     }
 
 #ifndef NKR_NO_GRPC
+    if (speedtesting) {
+        MessageBoxWarning(software_name, "The last speed test did not exit completely, please wait. If it persists, please restart the program.");
+        return;
+    }
+
     QStringList full_test_flags;
     if (mode == libcore::FullTest) {
-        auto w = new QDialog(this);
-        auto layout = new QVBoxLayout(w);
-        w->setWindowTitle(tr("Test Options"));
-        //
-        auto l1 = new QCheckBox(tr("Latency"));
-        auto l2 = new QCheckBox(tr("UDP latency"));
-        auto l3 = new QCheckBox(tr("Download speed"));
-        auto l4 = new QCheckBox(tr("In and Out IP"));
-        //
-        auto box = new QDialogButtonBox;
-        box->setOrientation(Qt::Horizontal);
-        box->setStandardButtons(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
-        connect(box, &QDialogButtonBox::accepted, w, &QDialog::accept);
-        connect(box, &QDialogButtonBox::rejected, w, &QDialog::reject);
-        //
-        layout->addWidget(l1);
-        layout->addWidget(l2);
-        layout->addWidget(l3);
-        layout->addWidget(l4);
-        layout->addWidget(box);
-        if (w->exec() != QDialog::Accepted) {
+        if (bypass_dialog) {
+            full_test_flags << "1" << "2" << "3";
+        } else {
+            auto w = new QDialog(this);
+            auto layout = new QVBoxLayout(w);
+            w->setWindowTitle(tr("Test Options"));
+            //
+            auto l1 = new QCheckBox(tr("Latency"));
+            auto l2 = new QCheckBox(tr("UDP latency"));
+            auto l3 = new QCheckBox(tr("Download speed"));
+            auto l4 = new QCheckBox(tr("In and Out IP"));
+            //
+            auto box = new QDialogButtonBox;
+            box->setOrientation(Qt::Horizontal);
+            box->setStandardButtons(QDialogButtonBox::Cancel | QDialogButtonBox::Ok);
+            connect(box, &QDialogButtonBox::accepted, w, &QDialog::accept);
+            connect(box, &QDialogButtonBox::rejected, w, &QDialog::reject);
+            //
+            layout->addWidget(l1);
+            layout->addWidget(l2);
+            layout->addWidget(l3);
+            layout->addWidget(l4);
+            layout->addWidget(box);
+            if (w->exec() != QDialog::Accepted) {
+                w->deleteLater();
+                return;
+            }
+            //
+            if (l1->isChecked()) full_test_flags << "1";
+            if (l2->isChecked()) full_test_flags << "2";
+            if (l3->isChecked()) full_test_flags << "3";
+            if (l4->isChecked()) full_test_flags << "4";
+            //
             w->deleteLater();
-            return;
         }
-        //
-        if (l1->isChecked()) full_test_flags << "1";
-        if (l2->isChecked()) full_test_flags << "2";
-        if (l3->isChecked()) full_test_flags << "3";
-        if (l4->isChecked()) full_test_flags << "4";
-        //
-        w->deleteLater();
         if (full_test_flags.isEmpty()) return;
     }
     speedtesting = true;
@@ -151,7 +154,7 @@ void MainWindow::speedtest_current_group(int mode, bool test_group) {
                     //
                     libcore::TestReq req;
                     req.set_mode((libcore::TestMode) mode);
-                    req.set_timeout(10 * 1000);
+                    req.set_timeout(3000);
                     req.set_url(NekoGui::dataStore->test_latency_url.toStdString());
 
                     //
@@ -182,7 +185,7 @@ void MainWindow::speedtest_current_group(int mode, bool test_group) {
                         }
                         //
                         auto config = new libcore::LoadConfigReq;
-                        config->set_core_config(QJsonObject2QString(c->coreConfig, false).toStdString());
+                        config->set_core_config(QJsonObject2QString(c->coreConfig, true).toStdString());
                         req.set_allocated_config(config);
                         req.set_in_address(profile->bean->serverAddress.toStdString());
 
@@ -239,7 +242,12 @@ void MainWindow::speedtest_current_group(int mode, bool test_group) {
         lock_return.lock();
         lock_return.unlock();
         speedtesting = false;
-        MW_show_log(QObject::tr("Speedtest finished."));
+        runOnUiThread([this] {
+            GroupSortAction gsa;
+            gsa.method = GroupSortMethod::ByLatency;
+            gsa.save_sort = true;
+            refresh_proxy_list_impl(-1, gsa);
+        });
     });
 #endif
 }
@@ -252,7 +260,7 @@ void MainWindow::speedtest_current() {
     runOnNewThread([=] {
         libcore::TestReq req;
         req.set_mode(libcore::UrlTest);
-        req.set_timeout(10 * 1000);
+        req.set_timeout(3000);
         req.set_url(NekoGui::dataStore->test_latency_url.toStdString());
 
         bool rpcOK;
@@ -264,12 +272,12 @@ void MainWindow::speedtest_current() {
 
         runOnUiThread([=] {
             if (!result.error().empty()) {
-                MW_show_log(QStringLiteral("UrlTest error: %1").arg(result.error().c_str()));
+                MW_show_log(QString("UrlTest error: %1").arg(result.error().c_str()));
             }
             if (latency <= 0) {
                 ui->label_running->setText(tr("Test Result") + ": " + tr("Unavailable"));
             } else if (latency > 0) {
-                ui->label_running->setText(tr("Test Result") + ": " + QStringLiteral("%1 ms").arg(latency));
+                ui->label_running->setText(tr("Test Result") + ": " + QString("%1 ms").arg(latency));
             }
         });
     });
@@ -308,7 +316,7 @@ void MainWindow::neko_start(int _id) {
     auto neko_start_stage2 = [=] {
 #ifndef NKR_NO_GRPC
         libcore::LoadConfigReq req;
-        req.set_core_config(QJsonObject2QString(result->coreConfig, false).toStdString());
+        req.set_core_config(QJsonObject2QString(result->coreConfig, true).toStdString());
         req.set_enable_nekoray_connections(NekoGui::dataStore->connection_statistics);
         if (NekoGui::dataStore->traffic_loop_interval > 0) {
             req.add_stats_outbounds("proxy");
@@ -488,67 +496,7 @@ void MainWindow::neko_stop(bool crash, bool sem) {
 }
 
 void MainWindow::CheckUpdate() {
-    // on new thread...
-#ifndef NKR_NO_GRPC
-    bool ok;
-    libcore::UpdateReq request;
-    request.set_action(libcore::UpdateAction::Check);
-    request.set_check_pre_release(NekoGui::dataStore->check_include_pre);
-    auto response = NekoGui_rpc::defaultClient->Update(&ok, request);
-    if (!ok) return;
-
-    auto err = response.error();
-    if (!err.empty()) {
-        runOnUiThread([=] {
-            MessageBoxWarning(QObject::tr("Update"), err.c_str());
-        });
-        return;
-    }
-
-    if (response.release_download_url() == nullptr) {
-        runOnUiThread([=] {
-            MessageBoxInfo(QObject::tr("Update"), QObject::tr("No update"));
-        });
-        return;
-    }
-
     runOnUiThread([=] {
-        auto allow_updater = !NekoGui::dataStore->flag_use_appdata;
-        auto note_pre_release = response.is_pre_release() ? " (Pre-release)" : "";
-        QMessageBox box(QMessageBox::Question, QObject::tr("Update") + note_pre_release,
-                        QObject::tr("Update found: %1\nRelease note:\n%2").arg(response.assets_name().c_str(), response.release_note().c_str()));
-        //
-        QAbstractButton *btn1 = nullptr;
-        if (allow_updater) {
-            btn1 = box.addButton(QObject::tr("Update"), QMessageBox::AcceptRole);
-        }
-        QAbstractButton *btn2 = box.addButton(QObject::tr("Open in browser"), QMessageBox::AcceptRole);
-        box.addButton(QObject::tr("Close"), QMessageBox::RejectRole);
-        box.exec();
-        //
-        if (btn1 == box.clickedButton() && allow_updater) {
-            // Download Update
-            runOnNewThread([=] {
-                bool ok2;
-                libcore::UpdateReq request2;
-                request2.set_action(libcore::UpdateAction::Download);
-                auto response2 = NekoGui_rpc::defaultClient->Update(&ok2, request2);
-                runOnUiThread([=] {
-                    if (response2.error().empty()) {
-                        auto q = QMessageBox::question(nullptr, QObject::tr("Update"),
-                                                       QObject::tr("Update is ready, restart to install?"));
-                        if (q == QMessageBox::StandardButton::Yes) {
-                            this->exit_reason = 1;
-                            on_menu_exit_triggered();
-                        }
-                    } else {
-                        MessageBoxWarning(QObject::tr("Update"), response2.error().c_str());
-                    }
-                });
-            });
-        } else if (btn2 == box.clickedButton()) {
-            QDesktopServices::openUrl(QUrl(response.release_url().c_str()));
-        }
+        QDesktopServices::openUrl(QUrl("https://github.com/AliShafiee2003/nekoray/releases/latest"));
     });
-#endif
 }
