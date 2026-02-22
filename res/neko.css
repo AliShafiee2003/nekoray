@@ -35,10 +35,10 @@ QTabWidget::pane {
 QTabBar::tab {
     border: 1px solid #7a7a85;
     border-bottom: none;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
-    min-height: 32px;
-    padding: 6px 16px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    min-height: 22px;
+    padding: 3px 12px;
     margin-right: 2px;
 }
 

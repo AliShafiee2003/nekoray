@@ -26,6 +26,10 @@
         <file>icon/menu-9-svgrepo-com.svg</file>
         <file>icon/play.svg</file>
         <file>icon/pause.svg</file>
+        <file>icon/action.svg</file>
+        <file>icon/remove.svg</file>
+        <file>icon/trash.svg</file>
+        <file>icon/clear.svg</file>
 
         <file>menu.svg</file>
         <file>speed.svg</file>

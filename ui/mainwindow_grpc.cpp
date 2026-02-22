@@ -128,6 +128,19 @@ void MainWindow::speedtest_current_group(int mode, bool bypass_dialog) {
         int threadN_finished = 0;
         auto profiles_test = profiles; // copy
 
+        // Wipe previous data
+    for (const auto &p : profiles_test) {
+        p->latency = 0;
+        p->full_test_report = "";
+        p->Save();
+    }
+    runOnUiThread([this] {
+        GroupSortAction gsa;
+        gsa.method = GroupSortMethod::ByLatency;
+        gsa.save_sort = true;
+        refresh_proxy_list_impl(-1, gsa);
+    });
+
         // Threads
         lock_return.lock();
         for (int i = 0; i < threadN; i++) {
@@ -168,7 +181,10 @@ void MainWindow::speedtest_current_group(int mode, bool bypass_dialog) {
                             profile->Save();
                             auto profileId = profile->id;
                             runOnUiThread([this, profileId] {
-                                refresh_proxy_list(profileId);
+                                GroupSortAction gsa;
+                                gsa.method = GroupSortMethod::ByLatency;
+                                gsa.save_sort = true;
+                                refresh_proxy_list_impl(-1, gsa);
                             });
                             continue;
                         }
@@ -232,7 +248,10 @@ void MainWindow::speedtest_current_group(int mode, bool bypass_dialog) {
 
                     auto profileId = profile->id;
                     runOnUiThread([this, profileId] {
-                        refresh_proxy_list(profileId);
+                        GroupSortAction gsa;
+                        gsa.method = GroupSortMethod::ByLatency;
+                        gsa.save_sort = true;
+                        refresh_proxy_list_impl(-1, gsa);
                     });
                 }
             });

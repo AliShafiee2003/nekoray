@@ -24,13 +24,13 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QToolButton" name="toolButton_program">
+       <widget class="QToolButton" name="toolButton_menu">
         <property name="text">
-         <string>Program</string>
+         <string>Menu</string>
         </property>
         <property name="icon">
-         <iconset theme="b-system-run">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset resource="../res/neko.qrc">
+           <normaloff>:/neko/icon/menu-9-svgrepo-com.svg</normaloff>:/neko/icon/menu-9-svgrepo-com.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -42,18 +42,18 @@
          <enum>QToolButton::InstantPopup</enum>
         </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="toolButton_preferences">
+       <widget class="QToolButton" name="toolButton_actions">
         <property name="text">
-         <string>Preferences</string>
+         <string>Actions</string>
         </property>
         <property name="icon">
-         <iconset theme="b-preferences">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset resource="../res/neko.qrc">
+           <normaloff>:/neko/icon/check.svg</normaloff>:/neko/icon/check.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -65,18 +65,18 @@
          <enum>QToolButton::InstantPopup</enum>
         </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="toolButton_server">
+       <widget class="QToolButton" name="toolButton_url_test">
         <property name="text">
-         <string>Server</string>
+         <string>Test</string>
         </property>
         <property name="icon">
-         <iconset theme="b-network-server">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset resource="../res/neko.qrc">
+           <normaloff>:/neko/icon/test-svgrepo-com.svg</normaloff>:/neko/icon/test-svgrepo-com.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -84,22 +84,19 @@
           <height>24</height>
          </size>
         </property>
-        <property name="popupMode">
-         <enum>QToolButton::InstantPopup</enum>
-        </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QToolButton" name="toolButton_ads">
+       <widget class="QToolButton" name="toolButton_play">
         <property name="text">
-         <string>Ads</string>
+         <string>Start</string>
         </property>
         <property name="icon">
-         <iconset theme="b-internet-web-browser">
-          <normaloff>.</normaloff>.</iconset>
+         <iconset resource="../res/neko.qrc">
+           <normaloff>:/neko/icon/play.svg</normaloff>:/neko/icon/play.svg</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -107,57 +104,8 @@
           <height>24</height>
          </size>
         </property>
-        <property name="popupMode">
-         <enum>QToolButton::InstantPopup</enum>
-        </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="toolButton_document">
-        <property name="text">
-         <string>Document</string>
-        </property>
-        <property name="icon">
-         <iconset theme="b-dialog-question">
-          <normaloff>.</normaloff>.</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="popupMode">
-         <enum>QToolButton::InstantPopup</enum>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QToolButton" name="toolButton_update">
-        <property name="text">
-         <string>Update</string>
-        </property>
-        <property name="icon">
-         <iconset theme="b-system-software-update">
-          <normaloff>.</normaloff>.</iconset>
-        </property>
-        <property name="iconSize">
-         <size>
-          <width>24</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="popupMode">
-         <enum>QToolButton::InstantPopup</enum>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
         </property>
        </widget>
       </item>
@@ -205,19 +153,6 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QToolButton" name="toolButton_url_test">
-        <property name="text">
-         <string>URL Test</string>
-        </property>
-        <property name="popupMode">
-         <enum>QToolButton::InstantPopup</enum>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonTextUnderIcon</enum>
-        </property>
-       </widget>
-      </item>
      </layout>
     </item>
     <item>
@@ -225,7 +160,7 @@
       <property name="orientation">
        <enum>Qt::Vertical</enum>
       </property>
-      <widget class="QTabWidget" name="tabWidget">
+       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
         <number>0</number>
        </property>
@@ -419,45 +354,76 @@
      </widget>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label_running">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Maximum</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>0</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_inbound">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_speed">
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-     </layout>
+     <widget class="QFrame" name="footerFrame">
+      <property name="frameShape">
+       <enum>QFrame::NoFrame</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Plain</enum>
+      </property>
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QLabel" name="label_running">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Maximum</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>0</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_inbound">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_speed">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelConfigFlag">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="labelConfigIP">
+         <property name="text">
+          <string/>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>250</width>
+           <height>30</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -512,13 +478,16 @@
     <addaction name="menu_spmode"/>
     <addaction name="menu_program_preference"/>
     <addaction name="separator"/>
+    <addaction name="menu_document"/>
+    <addaction name="menu_update"/>
+    <addaction name="separator"/>
     <addaction name="actionRestart_Proxy"/>
     <addaction name="actionRestart_Program"/>
     <addaction name="menu_exit"/>
    </widget>
    <widget class="QMenu" name="menu_preferences">
     <property name="title">
-     <string>Preferences</string>
+     <string>setting</string>
     </property>
     <addaction name="menu_manage_groups"/>
     <addaction name="menu_basic_settings"/>
@@ -584,9 +553,9 @@
     <addaction name="menu_profile_debug_info"/>
     <addaction name="separator"/>
    </widget>
-   <addaction name="menu_program"/>
    <addaction name="menu_preferences"/>
    <addaction name="menu_server"/>
+   <addaction name="menu_program"/>
   </widget>
   <action name="menu_exit">
    <property name="text">
@@ -678,7 +647,7 @@
     <string notr="true">Tcp Ping</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Ctrl+Alt+T</string>
+    <string notr="true">Ctrl+Shift+T</string>
    </property>
   </action>
   <action name="menu_url_test">
@@ -686,7 +655,7 @@
     <string notr="true">Url Test</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Ctrl+Alt+U</string>
+    <string notr="true">Ctrl+Shift+U</string>
    </property>
   </action>
   <action name="menu_clear_test_result">
@@ -694,7 +663,7 @@
     <string>Clear Test Result</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Ctrl+Alt+C</string>
+    <string notr="true">Ctrl+Shift+C</string>
    </property>
   </action>
   <action name="menu_export_config">
@@ -703,6 +672,24 @@
    </property>
    <property name="shortcut">
     <string notr="true">Ctrl+E</string>
+   </property>
+  </action>
+  <action name="menu_document">
+   <property name="text">
+    <string>Document</string>
+   </property>
+   <property name="icon">
+    <iconset theme="b-dialog-question">
+     <normaloff>.</normaloff>.</iconset>
+   </property>
+  </action>
+  <action name="menu_update">
+   <property name="text">
+    <string>Update</string>
+   </property>
+   <property name="icon">
+    <iconset theme="b-system-software-update">
+     <normaloff>.</normaloff>.</iconset>
    </property>
   </action>
   <action name="menu_reset_traffic">
@@ -739,7 +726,7 @@
     <string>Remove Duplicates</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Ctrl+Alt+D</string>
+    <string notr="true">Ctrl+Shift+D</string>
    </property>
   </action>
   <action name="actionfake">
@@ -787,7 +774,7 @@
     <string>Remove Unavailable</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Ctrl+Alt+R</string>
+    <string notr="true">Ctrl+Shift+R</string>
    </property>
   </action>
   <action name="menu_full_test">
@@ -795,7 +782,7 @@
     <string>Full Test</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Ctrl+Alt+F</string>
+    <string notr="true">Ctrl+Shift+F</string>
    </property>
   </action>
   <action name="menu_hotkey_settings">
@@ -816,7 +803,7 @@
     <string>Copy links of selected (Neko Links)</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Ctrl+N</string>
+    <string notr="true">Ctrl+Alt+C</string>
    </property>
   </action>
   <action name="actionfake_2">
@@ -872,7 +859,7 @@
     <string>Resolve domain</string>
    </property>
    <property name="shortcut">
-    <string notr="true">Ctrl+Alt+I</string>
+    <string notr="true">Ctrl+Shift+I</string>
    </property>
   </action>
   <action name="menu_vpn_settings">
@@ -914,9 +901,6 @@
   <action name="menu_stop_testing">
    <property name="text">
     <string>Stop Testing</string>
-   </property>
-   <property name="shortcut">
-    <string notr="true">Ctrl+Alt+S</string>
    </property>
   </action>
  </widget>

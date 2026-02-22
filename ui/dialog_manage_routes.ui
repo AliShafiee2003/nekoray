@@ -301,12 +301,7 @@ For more information, see the document &quot;Configuration/DNS&quot;.</string>
               </property>
               <item>
                <property name="text">
-                <string notr="true">local</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
-                <string notr="true">tls://120.53.53.53</string>
+                <string notr="true">localhost</string>
                </property>
               </item>
               <item>

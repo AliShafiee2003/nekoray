@@ -190,7 +190,7 @@ private:
 
     static void setup_grpc();
 
-    void speedtest_current_group(int mode);
+    void speedtest_current_group(int mode, bool bypass_dialog = false);
 
     void speedtest_current();
 

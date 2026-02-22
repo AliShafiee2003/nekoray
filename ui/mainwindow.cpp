@@ -86,11 +86,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->setupUi(this);
     ui->toolButton_menu->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     ui->toolButton_menu->setIconSize(QSize(20, 20));
-    ui->toolButton_menu->setIcon(QIcon(QPixmap(":/neko/icon/menu-9-svgrepo-com.svg")));
 
     ui->toolButton_url_test->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     ui->toolButton_url_test->setIconSize(QSize(20, 20));
-    ui->toolButton_url_test->setIcon(QIcon(QPixmap(":/neko/icon/test-svgrepo-com.svg")));
+
+    ui->toolButton_actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    ui->toolButton_actions->setIconSize(QSize(20, 20));
+
+    ui->toolButton_play->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    ui->toolButton_play->setIconSize(QSize(24, 24));
+
     //
     connect(ui->menu_start, &QAction::triggered, this, [=]() { neko_start(); });
     connect(ui->menu_stop, &QAction::triggered, this, [=]() { neko_stop(); });
@@ -140,15 +145,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     
     ui->menubar->setVisible(false);
 
-    ui->toolButton_menu->setFixedSize(64, 60);
-    ui->toolButton_url_test->setFixedSize(64, 60);
-    ui->toolButton_play->setFixedSize(64, 60);
+    ui->toolButton_menu->setFixedSize(76, 60);
+    ui->toolButton_actions->setFixedSize(76, 60);
+    ui->toolButton_url_test->setFixedSize(76, 60);
+    ui->toolButton_play->setFixedSize(84, 64);
+
+    ui->toolButton_menu->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    ui->toolButton_actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    ui->toolButton_url_test->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+    ui->toolButton_play->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     
     auto text_color = palette().color(QPalette::Text);
 
     ui->toolButton_menu->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/menu-9-svgrepo-com.svg", text_color));
     ui->toolButton_url_test->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/test-svgrepo-com.svg", text_color));
-    ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/play.svg", text_color));
+    ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/play.svg", QColor("#52c41a")));
     ui->toolButton_menu->setCursor(Qt::PointingHandCursor);
     ui->toolButton_url_test->setCursor(Qt::PointingHandCursor);
     ui->toolButton_play->setCursor(Qt::PointingHandCursor);
@@ -174,6 +185,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toolButton_menu->setStyleSheet(btnStyle);
     ui->toolButton_url_test->setStyleSheet(btnStyle);
     ui->toolButton_play->setStyleSheet(btnStyle);
+
+    ui->toolButton_actions->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/action.svg", text_color));
+    ui->toolButton_actions->setCursor(Qt::PointingHandCursor);
+    ui->toolButton_actions->setStyleSheet(btnStyle);
+    
+    auto actionsMenu = new QMenu(this);
+    ui->menu_remove_unavailable->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/remove.svg", "#ff3333"));
+    ui->menu_delete_repeat->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/trash.svg", text_color));
+    ui->menu_clear_test_result->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/clear.svg", text_color));
+    
+    actionsMenu->addAction(ui->menu_remove_unavailable);
+    actionsMenu->addAction(ui->menu_delete_repeat);
+    actionsMenu->addAction(ui->menu_clear_test_result);
+    ui->toolButton_actions->setMenu(actionsMenu);
 
     connect(ui->toolButton_url_test, &QToolButton::clicked, this, [=]() { speedtest_current_group(1); });
     
@@ -202,6 +227,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     btnAddGroup->setText("+");
     btnAddGroup->setObjectName("btnAddGroup");
     btnAddGroup->setCursor(Qt::PointingHandCursor);
+    
     btnAddGroup->setFixedSize(36, 32);
     ui->tabWidget->setCornerWidget(btnAddGroup, Qt::TopRightCorner);
     connect(btnAddGroup, &QToolButton::clicked, this, &MainWindow::on_add_group_clicked);
@@ -1646,7 +1672,7 @@ void MainWindow::on_menu_delete_repeat_triggered() {
     QList<std::shared_ptr<NekoGui::ProxyEntity>> out;
     QList<std::shared_ptr<NekoGui::ProxyEntity>> out_del;
 
-    NekoGui::ProfileFilter::Uniq(NekoGui::profileManager->CurrentGroup()->Profiles(), out, true, false);
+    NekoGui::ProfileFilter::Uniq(NekoGui::profileManager->CurrentGroup()->Profiles(), out, false, false);
     NekoGui::ProfileFilter::OnlyInSrc_ByPointer(NekoGui::profileManager->CurrentGroup()->Profiles(), out, out_del);
 
     int remove_display_count = 0;
@@ -1683,7 +1709,25 @@ void MainWindow::on_menu_remove_unavailable_triggered() {
 
     for (const auto &[_, profile]: NekoGui::profileManager->profiles) {
         if (NekoGui::dataStore->current_group != profile->gid) continue;
-        if (profile->latency < 0) out_del += profile;
+        
+        bool is_unavailable = false;
+        if (profile->latency < 0) {
+            is_unavailable = true;
+        } else if (!profile->full_test_report.isEmpty()) {
+            QRegularExpressionMatch lat_match = QRegularExpression("\\bLatency:\\s*([\\d\\.]+)ms").match(profile->full_test_report);
+            QRegularExpressionMatch udp_match = QRegularExpression("\\bUDPLatency:\\s*([\\d\\.]+)ms").match(profile->full_test_report);
+            QRegularExpressionMatch spd_match = QRegularExpression("\\bSpeed:\\s*([\\d\\.]+)MiB/s").match(profile->full_test_report);
+            
+            if (!lat_match.hasMatch() && !udp_match.hasMatch() && !spd_match.hasMatch()) {
+                if (profile->full_test_report.contains("Error", Qt::CaseInsensitive) || 
+                    profile->full_test_report.contains("Timeout", Qt::CaseInsensitive) ||
+                    profile->latency <= 1) {
+                    is_unavailable = true;
+                }
+            }
+        }
+
+        if (is_unavailable) out_del += profile;
     }
 
     int remove_display_count = 0;
@@ -1761,6 +1805,17 @@ void MainWindow::changeEvent(QEvent *event) {
             auto text_color = palette().color(QPalette::Text);
             ui->toolButton_menu->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/menu-9-svgrepo-com.svg", text_color));
             ui->toolButton_url_test->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/test-svgrepo-com.svg", text_color));
+            ui->toolButton_actions->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/action.svg", text_color));
+            ui->menu_delete_repeat->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/trash.svg", text_color));
+            ui->menu_clear_test_result->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/clear.svg", text_color));
+            
+            // Re-assert start/stop colors since they shouldn't just become pure text_color
+            if (NekoGui::dataStore->started_id >= 0) {
+                ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/pause.svg", QColor("#ff4d4f")));
+            } else {
+                ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/play.svg", QColor("#52c41a")));
+            }
+
             refresh_status();
         }
     }
