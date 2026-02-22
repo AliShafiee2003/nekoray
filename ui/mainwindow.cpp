@@ -133,9 +133,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     // top bar (Hamburger Menu)
     auto mainMenu = new QMenu(this);
-    mainMenu->addMenu(ui->menu_program);
     mainMenu->addMenu(ui->menu_preferences); // Renamed 'setting' in UI
     mainMenu->addMenu(ui->menu_server);
+    mainMenu->addMenu(ui->menu_program);
     ui->toolButton_menu->setMenu(mainMenu);
     
     ui->menubar->setVisible(false);
@@ -176,6 +176,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toolButton_play->setStyleSheet(btnStyle);
 
     connect(ui->toolButton_url_test, &QToolButton::clicked, this, [=]() { speedtest_current_group(1); });
+    
+    // Test Button context menu
+    auto testMenu = new QMenu(this);
+    testMenu->addAction(tr("URL Test"), this, [=]() { speedtest_current_group(1); });
+    testMenu->addAction(tr("Full Test"), this, [=]() { speedtest_current_group(2, true); });
+    testMenu->addAction(tr("TCP Ping"), this, [=]() { speedtest_current_group(0); });
+    ui->toolButton_url_test->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->toolButton_url_test, &QWidget::customContextMenuRequested, this, [=](const QPoint &pos) {
+        testMenu->exec(ui->toolButton_url_test->mapToGlobal(pos));
+    });
+
     connect(ui->toolButton_play, &QToolButton::clicked, this, [=]() {
         if (NekoGui::dataStore->started_id >= 0) {
             neko_stop();
@@ -443,7 +454,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         AutoRun_SetEnabled(checked);
     });
     connect(ui->actionAllow_LAN, &QAction::triggered, this, [=](bool checked) {
-        NekoGui::dataStore->inbound_address = checked ? "::" : "127.0.0.1";
+        NekoGui::dataStore->inbound_address = checked ? "0.0.0.0" : "127.0.0.1";
         MW_dialog_message("", "UpdateDataStore");
     });
     //
@@ -1024,10 +1035,10 @@ void MainWindow::refresh_status(const QString &traffic_update) {
     }
 
     if (icon_status_new != Icon::NONE) {
-        ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/pause.svg", palette().color(QPalette::Text)));
+        ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/pause.svg", QColor("#ff4d4f"))); // Red for Stop
         ui->toolButton_play->setText(tr("Stop"));
     } else {
-        ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/play.svg", palette().color(QPalette::Text)));
+        ui->toolButton_play->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/play.svg", QColor("#52c41a"))); // Green for Start
         ui->toolButton_play->setText(tr("Start"));
     }
 
@@ -1092,7 +1103,7 @@ void MainWindow::refresh_status(const QString &traffic_update) {
                                 
                                 QPixmap flagPixmap(QString(":/flags/icon/flag-icons-main/flags/4x3/%1.svg").arg(countryCode));
                                 if (!flagPixmap.isNull()) {
-                                    state->ui->labelConfigFlag->setPixmap(flagPixmap.scaled(24, 18, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                                    state->ui->labelConfigFlag->setPixmap(flagPixmap.scaled(36, 27, Qt::KeepAspectRatio, Qt::SmoothTransformation));
                                 } else {
                                     state->ui->labelConfigFlag->setPixmap(QPixmap());
                                 }
