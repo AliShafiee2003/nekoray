@@ -66,6 +66,7 @@ static QIcon Utils_ColorizeSvgIcon(const QString &path, const QColor &color) {
     file.close();
     svg.replace("#000000", color.name(), Qt::CaseInsensitive);
     svg.replace("#ffffff", color.name(), Qt::CaseInsensitive);
+    svg.replace("#1C274C", color.name(), Qt::CaseInsensitive);
     QPixmap pixmap;
     pixmap.loadFromData(svg.toUtf8(), "SVG");
     return QIcon(pixmap);
@@ -195,9 +196,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->menu_delete_repeat->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/trash.svg", text_color));
     ui->menu_clear_test_result->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/clear.svg", text_color));
     
-    actionsMenu->addAction(ui->menu_remove_unavailable);
     actionsMenu->addAction(ui->menu_delete_repeat);
     actionsMenu->addAction(ui->menu_clear_test_result);
+    actionsMenu->addSeparator();
+    ui->menu_stop_testing->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/stop-testing.svg", text_color));
+    actionsMenu->addAction(ui->menu_stop_testing);
+    actionsMenu->addSeparator();
+    ui->actionRestart_Proxy->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/replay-proxy.svg", text_color));
+    actionsMenu->addAction(ui->actionRestart_Proxy);
+    ui->actionRestart_Program->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/restart-program.svg", "#faad14"));
+    actionsMenu->addAction(ui->actionRestart_Program);
+    auto actionExit = actionsMenu->addAction(Utils_ColorizeSvgIcon(":/neko/icon/exit.svg", "#ff3333"), tr("Exit"));
+    connect(actionExit, &QAction::triggered, this, [=]() { on_menu_exit_triggered(); });
     ui->toolButton_actions->setMenu(actionsMenu);
 
     connect(ui->toolButton_url_test, &QToolButton::clicked, this, [=]() { speedtest_current_group(1); });
@@ -224,11 +234,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->menu_update, &QAction::triggered, this, [=] { runOnNewThread([=] { CheckUpdate(); }); });
 
     auto btnAddGroup = new QToolButton(this);
-    btnAddGroup->setText("+");
+    btnAddGroup->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/add.svg", text_color));
+    btnAddGroup->setIconSize(QSize(22, 22));
     btnAddGroup->setObjectName("btnAddGroup");
     btnAddGroup->setCursor(Qt::PointingHandCursor);
-    
-    btnAddGroup->setFixedSize(36, 32);
+    btnAddGroup->setToolTip(tr("Add Group"));
+    btnAddGroup->setStyleSheet("QToolButton { border: none; padding: 4px; } QToolButton:hover { background-color: rgba(128,128,128,0.2); border-radius: 4px; }");
+    btnAddGroup->setFixedSize(40, 36);
     ui->tabWidget->setCornerWidget(btnAddGroup, Qt::TopRightCorner);
     connect(btnAddGroup, &QToolButton::clicked, this, &MainWindow::on_add_group_clicked);
 
@@ -1808,6 +1820,11 @@ void MainWindow::changeEvent(QEvent *event) {
             ui->toolButton_actions->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/action.svg", text_color));
             ui->menu_delete_repeat->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/trash.svg", text_color));
             ui->menu_clear_test_result->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/clear.svg", text_color));
+            ui->actionRestart_Proxy->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/replay-proxy.svg", text_color));
+            ui->menu_stop_testing->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/stop-testing.svg", text_color));
+            // Update add group button icon
+            auto btnAddGroup = findChild<QToolButton*>("btnAddGroup");
+            if (btnAddGroup) btnAddGroup->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/add.svg", text_color));
             
             // Re-assert start/stop colors since they shouldn't just become pure text_color
             if (NekoGui::dataStore->started_id >= 0) {

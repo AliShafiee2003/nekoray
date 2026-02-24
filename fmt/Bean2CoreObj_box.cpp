@@ -2,8 +2,13 @@
 #include "fmt/includes.h"
 
 namespace NekoGui_fmt {
-    void V2rayStreamSettings::BuildStreamSettingsSingBox(QJsonObject *outbound) {
+    QString V2rayStreamSettings::BuildStreamSettingsSingBox(QJsonObject *outbound) {
         // https://sing-box.sagernet.org/configuration/shared/v2ray-transport
+
+        // Reject transport types not supported by sing-box
+        if (network == "xhttp" || network == "splithttp" || network == "kcp") {
+            return QString("Unsupported transport type: %1 (not supported by sing-box core)").arg(network);
+        }
 
         if (network != "tcp") {
             QJsonObject transport{{"type", network}};
@@ -76,6 +81,8 @@ namespace NekoGui_fmt {
         if (outbound->value("type").toString() == "vmess" || outbound->value("type").toString() == "vless") {
             outbound->insert("packet_encoding", packet_encoding);
         }
+
+        return {}; // no error
     }
 
     CoreObjOutboundBuildResult SocksHttpBean::BuildCoreObjSingBox() {
@@ -92,7 +99,8 @@ namespace NekoGui_fmt {
             outbound["password"] = password;
         }
 
-        stream->BuildStreamSettingsSingBox(&outbound);
+        auto streamErr = stream->BuildStreamSettingsSingBox(&outbound);
+        if (!streamErr.isEmpty()) { result.error = streamErr; return result; }
         result.outbound = outbound;
         return result;
     }
@@ -121,7 +129,8 @@ namespace NekoGui_fmt {
             outbound["plugin_opts"] = SubStrAfter(plugin, ";");
         }
 
-        stream->BuildStreamSettingsSingBox(&outbound);
+        auto streamErr = stream->BuildStreamSettingsSingBox(&outbound);
+        if (!streamErr.isEmpty()) { result.error = streamErr; return result; }
         result.outbound = outbound;
         return result;
     }
@@ -138,7 +147,8 @@ namespace NekoGui_fmt {
             {"security", security},
         };
 
-        stream->BuildStreamSettingsSingBox(&outbound);
+        auto streamErr = stream->BuildStreamSettingsSingBox(&outbound);
+        if (!streamErr.isEmpty()) { result.error = streamErr; return result; }
         result.outbound = outbound;
         return result;
     }
@@ -167,7 +177,8 @@ namespace NekoGui_fmt {
             outbound["password"] = password;
         }
 
-        stream->BuildStreamSettingsSingBox(&outbound);
+        auto streamErr = stream->BuildStreamSettingsSingBox(&outbound);
+        if (!streamErr.isEmpty()) { result.error = streamErr; return result; }
         result.outbound = outbound;
         return result;
     }
@@ -191,12 +202,27 @@ namespace NekoGui_fmt {
             {"tls", coreTlsObj},
         };
 
-        if (proxy_type == proxy_Hysteria2) {
+        if (proxy_type == proxy_Hysteria) {
+            outbound["type"] = "hysteria";
+            outbound["obfs"] = obfsPassword;
+            outbound["disable_mtu_discovery"] = disableMtuDiscovery;
+            outbound["recv_window"] = streamReceiveWindow;
+            outbound["recv_window_conn"] = connectionReceiveWindow;
+            outbound["up_mbps"] = uploadMbps;
+            outbound["down_mbps"] = downloadMbps;
+
+            if (!hopPort.trimmed().isEmpty()) {
+                outbound["hop_ports"] = hopPort;
+                outbound["hop_interval"] = hopInterval;
+            }
+            if (authPayloadType == hysteria_auth_base64) outbound["auth"] = authPayload;
+            if (authPayloadType == hysteria_auth_string) outbound["auth_str"] = authPayload;
+        } else if (proxy_type == proxy_Hysteria2) {
             outbound["type"] = "hysteria2";
             outbound["password"] = password;
             outbound["up_mbps"] = uploadMbps;
             outbound["down_mbps"] = downloadMbps;
-
+            
             if (!hopPort.trimmed().isEmpty()) {
                 outbound["hop_ports"] = hopPort;
                 outbound["hop_interval"] = hopInterval;

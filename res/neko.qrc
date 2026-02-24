@@ -30,6 +30,11 @@
         <file>icon/remove.svg</file>
         <file>icon/trash.svg</file>
         <file>icon/clear.svg</file>
+        <file>icon/stop-testing.svg</file>
+        <file>icon/replay-proxy.svg</file>
+        <file>icon/restart-program.svg</file>
+        <file>icon/exit.svg</file>
+        <file>icon/add.svg</file>
 
         <file>menu.svg</file>
         <file>speed.svg</file>

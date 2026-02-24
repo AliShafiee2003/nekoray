@@ -9,6 +9,7 @@
 
 #include <QTimer>
 #include <QThread>
+#include <QAtomicInt>
 #include <QInputDialog>
 #include <QPushButton>
 #include <QDesktopServices>
@@ -56,7 +57,7 @@ void MainWindow::setup_grpc() {
 // 测速
 
 inline bool speedtesting = false;
-inline QList<QThread *> speedtesting_threads = {};
+inline QAtomicInt speedtest_stop_flag{0};
 
 void MainWindow::speedtest_current_group(int mode, bool bypass_dialog) {
     auto profiles = get_selected_or_group();
@@ -66,18 +67,27 @@ void MainWindow::speedtest_current_group(int mode, bool bypass_dialog) {
 
     // menu_stop_testing
     if (mode == 114514) {
-        while (!speedtesting_threads.isEmpty()) {
-            auto t = speedtesting_threads.takeFirst();
-            if (t != nullptr) t->exit();
-        }
-        speedtesting = false;
+        speedtest_stop_flag.storeRelaxed(1);
         return;
     }
 
 #ifndef NKR_NO_GRPC
     if (speedtesting) {
-        MessageBoxWarning(software_name, "The last speed test did not exit completely, please wait. If it persists, please restart the program.");
-        return;
+        QString newTestName;
+        switch (mode) {
+            case 0: newTestName = tr("TCP Ping"); break;
+            case 1: newTestName = tr("URL Test"); break;
+            case 2: newTestName = tr("Full Test"); break;
+            default: newTestName = tr("Test"); break;
+        }
+        auto result = QMessageBox::question(this, software_name,
+            tr("A test is already running.\n\nDo you want to stop the current test and start %1?").arg(newTestName),
+            QMessageBox::Yes | QMessageBox::No);
+        if (result != QMessageBox::Yes) return;
+        // Stop current test and wait briefly
+        speedtest_stop_flag.storeRelaxed(1);
+        QThread::msleep(300);
+        speedtesting = false;
     }
 
     QStringList full_test_flags;
@@ -120,6 +130,7 @@ void MainWindow::speedtest_current_group(int mode, bool bypass_dialog) {
         if (full_test_flags.isEmpty()) return;
     }
     speedtesting = true;
+    speedtest_stop_flag.storeRelaxed(0);
 
     runOnNewThread([this, profiles, mode, full_test_flags]() {
         QMutex lock_write;
@@ -145,9 +156,15 @@ void MainWindow::speedtest_current_group(int mode, bool bypass_dialog) {
         lock_return.lock();
         for (int i = 0; i < threadN; i++) {
             runOnNewThread([&] {
-                speedtesting_threads << QObject::thread();
-
                 forever {
+                    // Check stop flag
+                    if (speedtest_stop_flag.loadRelaxed()) {
+                        lock_write.lock();
+                        threadN_finished++;
+                        if (threadN == threadN_finished) lock_return.unlock();
+                        lock_write.unlock();
+                        return;
+                    }
                     //
                     lock_write.lock();
                     if (profiles_test.isEmpty()) {
@@ -158,7 +175,6 @@ void MainWindow::speedtest_current_group(int mode, bool bypass_dialog) {
                         }
                         lock_write.unlock();
                         // quit of this thread
-                        speedtesting_threads.removeAll(QObject::thread());
                         return;
                     }
                     auto profile = profiles_test.takeFirst();

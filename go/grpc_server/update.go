@@ -25,7 +25,7 @@ func (s *BaseServer) Update(ctx context.Context, in *gen.UpdateReq) (*gen.Update
 		ctx, cancel := context.WithTimeout(ctx, time.Second*10)
 		defer cancel()
 
-		req, _ := http.NewRequestWithContext(ctx, "GET", "https://api.github.com/repos/MatsuriDayo/nekoray/releases", nil)
+		req, _ := http.NewRequestWithContext(ctx, "GET", "https://api.github.com/repos/AliShafiee2003/nekoray/releases", nil)
 		resp, err := client.Do(req)
 		if err != nil {
 			ret.Error = err.Error()
@@ -53,6 +53,10 @@ func (s *BaseServer) Update(ctx context.Context, in *gen.UpdateReq) (*gen.Update
 		var search string
 		if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
 			search = "windows64"
+			// check Qt5 update after nekoray v3.3
+			if _, err := os.Stat("../Qt5Core.dll"); err == nil {
+				search = "windows7-x64"
+			}
 		} else if runtime.GOOS == "linux" && runtime.GOARCH == "amd64" {
 			search = "linux64"
 		} else if runtime.GOOS == "darwin" {
