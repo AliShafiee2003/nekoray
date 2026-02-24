@@ -39,6 +39,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: ^1.22
+          cache-dependency-path: "go/**/*.sum"
       - name: Build golang parts
         if: steps.cache-common.outputs.cache-hit != 'true'
         shell: bash
