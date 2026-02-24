@@ -135,6 +135,7 @@ namespace NekoGui {
         // Socks & HTTP Inbound
         QString inbound_address = "127.0.0.1";
         int inbound_socks_port = 2080; // or Mixed
+        int inbound_http_port = 2081;
         InboundAuthorization *inbound_auth = new InboundAuthorization;
         QString custom_inbound = "{\"inbounds\": []}";
 
@@ -164,6 +165,7 @@ namespace NekoGui {
         int core_box_clash_api = -9090;
         QString core_box_clash_api_secret = "";
         QString core_box_underlying_dns = "";
+        QString core_ray_freedom_domainStrategy = "";
 
         // Other Core
         ExtraCore *extraCore = new ExtraCore;

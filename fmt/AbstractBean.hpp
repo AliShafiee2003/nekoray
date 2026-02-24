@@ -61,6 +61,8 @@ namespace NekoGui_fmt {
 
         virtual CoreObjOutboundBuildResult BuildCoreObjSingBox() { return {}; };
 
+        virtual CoreObjOutboundBuildResult BuildCoreObjV2Ray() { return {}; };
+
         virtual ExternalBuildResult BuildExternal(int mapping_port, int socks_port, int external_stat) { return {}; };
 
         virtual QString ToShareLink() { return {}; };
