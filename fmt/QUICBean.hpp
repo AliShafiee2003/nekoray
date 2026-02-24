@@ -5,14 +5,27 @@
 namespace NekoGui_fmt {
     class QUICBean : public AbstractBean {
     public:
-        // static constexpr int proxy_Hysteria = 0;
+        static constexpr int proxy_Hysteria = 0;
         static constexpr int proxy_TUIC = 1;
         static constexpr int proxy_Hysteria2 = 3;
         int proxy_type = proxy_Hysteria2;
 
         bool forceExternal = false;
 
-        // Hysteria 2
+        // Hysteria 1
+
+        static constexpr int hysteria_protocol_udp = 0;
+        static constexpr int hysteria_protocol_facktcp = 1;
+        static constexpr int hysteria_protocol_wechat_video = 2;
+        int hyProtocol = 0;
+
+        static constexpr int hysteria_auth_none = 0;
+        static constexpr int hysteria_auth_string = 1;
+        static constexpr int hysteria_auth_base64 = 2;
+        int authPayloadType = 0;
+        QString authPayload = "";
+
+        // Hysteria 1&2
 
         QString obfsPassword = "";
 
