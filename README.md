@@ -4,6 +4,8 @@
 
 A Qt-based cross-platform GUI proxy configuration manager (backend: sing-box). Currently supports **Windows / Linux** out of the box.
 
+![Screenshot of Nekoray 4.1.0](main.png)
+
 ---
 
 ## ✨ What's New in this Modded Version?
@@ -15,6 +17,8 @@ This fork focuses on streamlining the user experience and modernizing the interf
 - 🔄 **Smart Auto-Sorting:** The proxy list now automatically sorts itself by ping/latency immediately after a URL test finishes. 
 - ➕ **Quick "Add Group" Actions:** Introduced a highly accessible `+` button directly next to the tab bar, making profile and group management much more intuitive.
 - 🌍 **Enhanced Footer Data:** The bottom status bar now provides rich, dynamic information about your active out-bound connection, including **Exit IP, Country Name, and Country Flag**.
+- 🛠️ **Actions Menu:** A new centralized dropdown menu for batch operations, including Regex-backed removal of unavailable nodes, duplicate filtering, and clearing test results.
+- 🚀 **Next-Gen Core & App Engine:** Bumped version to `4.1.0`, integrating upstream core functionality while deprecating outdated legacy protocols like Hysteria 1. 
 - 🎨 **Unified Design Language:** Completely fixed Qt's native rendering bugs (like disappearing borders in Windows Fusion style). Added responsive `:hover` and `:pressed` feedback loops to main buttons. The design looks exceptionally native and clean on both **Light** and **Dark** forms.
 
 ---
