@@ -4,7 +4,7 @@
 
 A Qt-based cross-platform GUI proxy configuration manager (backend: sing-box). Currently supports **Windows / Linux** out of the box.
 
-![Screenshot of Nekoray 4.1.0](img1.png)
+![Screenshot of Nekoray 4.1.0](img.png)
 
 ![Screenshot of Nekoray 4.1.0](img2.png)
 
