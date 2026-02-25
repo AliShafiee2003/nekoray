@@ -54,6 +54,23 @@
 #include <QNetworkProxy>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QPainter>
+#include <QPainterPath>
+#include <QStyleFactory>
+
+// Helper: clip a pixmap with rounded corners
+static QPixmap roundPixmap(const QPixmap &src, int radius) {
+    if (src.isNull()) return src;
+    QPixmap dest(src.size());
+    dest.fill(Qt::transparent);
+    QPainter painter(&dest);
+    painter.setRenderHint(QPainter::Antialiasing);
+    QPainterPath path;
+    path.addRoundedRect(dest.rect(), radius, radius);
+    painter.setClipPath(path);
+    painter.drawPixmap(0, 0, src);
+    return dest;
+}
 
 void UI_InitMainWindow() {
     mainwindow = new MainWindow;
@@ -111,6 +128,71 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->label_running->installEventFilter(this);
     ui->label_inbound->installEventFilter(this);
     ui->splitter->installEventFilter(this);
+    // Detect dark/light mode
+    bool isDarkMode = palette().color(QPalette::Window).lightness() < 128;
+    
+    // Footer: professional card-based design with golden/amber borders
+    // Remove existing footer layout items
+    auto oldFooterLayout = ui->footerFrame->layout();
+    QLayoutItem *child;
+    while ((child = oldFooterLayout->takeAt(0)) != nullptr) {
+        delete child;
+    }
+    delete oldFooterLayout;
+
+    // Golden/amber card style
+    QString cardStyle =
+        QString("background-color: rgba(%1, 0.06);"
+        "border: 1px solid rgba(180, 160, 60, 0.3);"
+        "border-radius: 8px;").arg(isDarkMode ? "180, 160, 60" : "120, 100, 30");
+
+    // Adaptive text color for secondary labels
+    QString secondaryColor = isDarkMode ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.55)";
+
+    // Card 1: Profile info (running + inbound)
+    auto card1 = new QFrame(ui->footerFrame);
+    card1->setStyleSheet(QString("QFrame { %1 }").arg(cardStyle));
+    auto card1Layout = new QHBoxLayout(card1);
+    card1Layout->setContentsMargins(10, 4, 10, 4);
+    card1Layout->setSpacing(6);
+    ui->label_running->setStyleSheet("QLabel { background: transparent; border: none; font-size: 12px; }");
+    ui->label_inbound->setStyleSheet(QString("QLabel { background: transparent; border: none; font-size: 12px; color: %1; }").arg(secondaryColor));
+    card1Layout->addWidget(ui->label_running);
+    card1Layout->addWidget(ui->label_inbound);
+
+    // Card 2: Traffic stats (fixed width to prevent jitter)
+    auto card2 = new QFrame(ui->footerFrame);
+    card2->setStyleSheet(QString("QFrame { %1 }").arg(cardStyle));
+    card2->setMinimumWidth(210);
+    card2->setMaximumWidth(230);
+    auto card2Layout = new QHBoxLayout(card2);
+    card2Layout->setContentsMargins(10, 4, 10, 4);
+    ui->label_speed->setStyleSheet("QLabel { background: transparent; border: none; font-size: 11px; }");
+    card2Layout->addWidget(ui->label_speed);
+
+    // Card 3: Flag + Location/IP
+    auto card3 = new QFrame(ui->footerFrame);
+    card3->setStyleSheet(QString("QFrame { %1 }").arg(cardStyle));
+    auto card3Layout = new QHBoxLayout(card3);
+    card3Layout->setContentsMargins(4, 3, 10, 3);
+    card3Layout->setSpacing(8);
+    ui->labelConfigFlag->setStyleSheet("QLabel { background: transparent; border: none; }");
+    ui->labelConfigIP->setStyleSheet("QLabel { background: transparent; border: none; font-size: 12px; }");
+    ui->labelConfigIP->setMinimumSize(QSize(180, 24));
+    card3Layout->addWidget(ui->labelConfigFlag);
+    card3Layout->addWidget(ui->labelConfigIP);
+
+    // Main footer layout
+    auto footerLayout = new QHBoxLayout(ui->footerFrame);
+    footerLayout->setContentsMargins(6, 4, 6, 4);
+    footerLayout->setSpacing(8);
+    footerLayout->addWidget(card1, 1);
+    footerLayout->addWidget(card2, 0);
+    footerLayout->addWidget(card3, 1);
+    
+    ui->footerFrame->setStyleSheet(
+        ui->footerFrame->styleSheet() + 
+        "QFrame#footerFrame { background: transparent; border: none; padding: 0; margin-top: 2px; }");
     //
     RegisterHotkey(false);
     //
@@ -137,8 +219,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         }
     }
 
+    // Helper: fix menu rendering in light mode (Windows 11 native style ignores stylesheets)
+    auto fixMenuStyle = [isDarkMode](QMenu *menu) {
+        if (!isDarkMode) {
+            menu->setStyle(QStyleFactory::create("Fusion"));
+            menu->setStyleSheet(
+                "QMenu { background-color: #f5f5f5; color: #1a1a1a; border: 1px solid #c0c0c0; padding: 4px; border-radius: 4px; }"
+                "QMenu::item { color: #1a1a1a; padding: 6px 24px; border-radius: 4px; margin: 2px; }"
+                "QMenu::item:selected { background-color: rgba(50, 100, 200, 0.15); color: #2563eb; }"
+                "QMenu::separator { height: 1px; background: #d0d0d0; margin: 4px 8px; }"
+            );
+        }
+    };
+
     // top bar (Hamburger Menu)
     auto mainMenu = new QMenu(this);
+    fixMenuStyle(mainMenu);
+    fixMenuStyle(ui->menu_preferences);
+    fixMenuStyle(ui->menu_server);
+    fixMenuStyle(ui->menu_program);
     mainMenu->addMenu(ui->menu_preferences); // Renamed 'setting' in UI
     mainMenu->addMenu(ui->menu_server);
     mainMenu->addMenu(ui->menu_program);
@@ -146,10 +245,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     
     ui->menubar->setVisible(false);
 
-    ui->toolButton_menu->setFixedSize(76, 60);
-    ui->toolButton_actions->setFixedSize(76, 60);
-    ui->toolButton_url_test->setFixedSize(76, 60);
-    ui->toolButton_play->setFixedSize(84, 64);
+    ui->toolButton_menu->setFixedSize(66, 52);
+    ui->toolButton_actions->setFixedSize(66, 52);
+    ui->toolButton_url_test->setFixedSize(66, 52);
+    ui->toolButton_play->setFixedSize(72, 56);
 
     ui->toolButton_menu->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
     ui->toolButton_actions->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -165,23 +264,28 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toolButton_url_test->setCursor(Qt::PointingHandCursor);
     ui->toolButton_play->setCursor(Qt::PointingHandCursor);
     
+    // Header button style - adaptive to dark/light mode
+    QString btnBg = isDarkMode ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)";
+    QString btnHoverBg = isDarkMode ? "rgba(137, 180, 250, 0.18)" : "rgba(50, 100, 200, 0.12)";
+    QString btnPressBg = isDarkMode ? "rgba(137, 180, 250, 0.30)" : "rgba(50, 100, 200, 0.20)";
+    QString btnHoverColor = isDarkMode ? "#89b4fa" : "#2563eb";
+    
     QString btnStyle = 
-        "QToolButton {"
-        "  background-color: transparent;"
-        "  border: 1px solid #7a7a85;"
-        "  border-radius: 8px;"
-        "  padding: 2px;"
+        QString("QToolButton {"
+        "  background-color: %1;"
+        "  border: none;"
+        "  border-radius: 10px;"
+        "  padding: 4px 6px;"
+        "  font-size: 11px;"
         "}"
         "QToolButton:hover {"
-        "  background-color: rgba(137, 180, 250, 0.15);"
-        "  border-color: #89b4fa;"
-        "  color: #89b4fa;"
+        "  background-color: %2;"
+        "  color: %4;"
         "}"
         "QToolButton:pressed, QToolButton::menu-button:pressed {"
-        "  background-color: rgba(137, 180, 250, 0.3);"
-        "  border-color: #89b4fa;"
-        "  color: #89b4fa;"
-        "}";
+        "  background-color: %3;"
+        "  color: %4;"
+        "}").arg(btnBg, btnHoverBg, btnPressBg, btnHoverColor);
         
     ui->toolButton_menu->setStyleSheet(btnStyle);
     ui->toolButton_url_test->setStyleSheet(btnStyle);
@@ -192,6 +296,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toolButton_actions->setStyleSheet(btnStyle);
     
     auto actionsMenu = new QMenu(this);
+    fixMenuStyle(actionsMenu);
     ui->menu_remove_unavailable->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/remove.svg", "#ff3333"));
     ui->menu_delete_repeat->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/trash.svg", text_color));
     ui->menu_clear_test_result->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/clear.svg", text_color));
@@ -214,6 +319,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     
     // Test Button context menu
     auto testMenu = new QMenu(this);
+    fixMenuStyle(testMenu);
     testMenu->addAction(tr("URL Test"), this, [=]() { speedtest_current_group(1); });
     testMenu->addAction(tr("Full Test"), this, [=]() { speedtest_current_group(2, true); });
     testMenu->addAction(tr("TCP Ping"), this, [=]() { speedtest_current_group(0); });
@@ -235,13 +341,36 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
     auto btnAddGroup = new QToolButton(this);
     btnAddGroup->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/add.svg", text_color));
-    btnAddGroup->setIconSize(QSize(22, 22));
+    btnAddGroup->setIconSize(QSize(24, 24));
     btnAddGroup->setObjectName("btnAddGroup");
     btnAddGroup->setCursor(Qt::PointingHandCursor);
     btnAddGroup->setToolTip(tr("Add Group"));
-    btnAddGroup->setStyleSheet("QToolButton { border: none; padding: 4px; } QToolButton:hover { background-color: rgba(128,128,128,0.2); border-radius: 4px; }");
-    btnAddGroup->setFixedSize(40, 36);
+    btnAddGroup->setStyleSheet("QToolButton { border: none; padding: 5px; margin-bottom: 8px; } QToolButton:hover { background-color: rgba(128,128,128,0.2); border-radius: 7px; }");
+    btnAddGroup->setFixedSize(38, 38);
     ui->tabWidget->setCornerWidget(btnAddGroup, Qt::TopRightCorner);
+
+    // Tab containers: border-radius + shift tabs left to align with rounded borders
+    QString tabContainerStyle =
+        "QTabWidget::pane {"
+        "  border-radius: 8px;"
+        "  border: 1px solid rgba(128,128,128,0.3);"
+        "}"
+        "QTabBar::tab {"
+        "  margin-left: 6px;"
+        "}";
+    ui->tabWidget->setStyleSheet(tabContainerStyle);
+    ui->down_tab->setStyleSheet(tabContainerStyle);
+
+    // Splitter handle: thin line with spacing from both boxes
+    ui->splitter->setHandleWidth(3);
+    ui->splitter->setStyleSheet(
+        "QSplitter::handle {"
+        "  background-color: rgba(128,128,128,0.25);"
+        "  margin-top: 4px;"
+        "  margin-bottom: 4px;"
+        "  margin-left: 18px;"
+        "  margin-right: 18px;"
+        "}");
     connect(btnAddGroup, &QToolButton::clicked, this, &MainWindow::on_add_group_clicked);
 
     ui->tabWidget->tabBar()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -253,6 +382,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         if (!group) return;
 
         QMenu menu(this);
+        if (!isDarkMode) {
+            menu.setStyle(QStyleFactory::create("Fusion"));
+            menu.setStyleSheet(
+                "QMenu { background-color: #f5f5f5; color: #1a1a1a; border: 1px solid #c0c0c0; padding: 4px; border-radius: 4px; }"
+                "QMenu::item { color: #1a1a1a; padding: 6px 24px; border-radius: 4px; margin: 2px; }"
+                "QMenu::item:selected { background-color: rgba(50, 100, 200, 0.15); color: #2563eb; }"
+                "QMenu::separator { height: 1px; background: #d0d0d0; margin: 4px 8px; }"
+            );
+        }
         if (!group->url.isEmpty()) {
             auto a = menu.addAction(tr("Update Subscription"));
             connect(a, &QAction::triggered, this, [=]() {
@@ -287,6 +425,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->masterLogBrowser->setUndoRedoEnabled(false);
     ui->masterLogBrowser->setDocument(qvLogDocument);
     ui->masterLogBrowser->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+    ui->masterLogBrowser->setStyleSheet(
+        "QTextBrowser { padding: 6px 10px; }");
     {
         auto font = ui->masterLogBrowser->font();
         font.setPointSize(9);
@@ -1141,7 +1281,7 @@ void MainWindow::refresh_status(const QString &traffic_update) {
                                 
                                 QPixmap flagPixmap(QString(":/flags/icon/flag-icons-main/flags/4x3/%1.svg").arg(countryCode));
                                 if (!flagPixmap.isNull()) {
-                                    state->ui->labelConfigFlag->setPixmap(flagPixmap.scaled(36, 27, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+                                    state->ui->labelConfigFlag->setPixmap(roundPixmap(flagPixmap.scaled(48, 36, Qt::KeepAspectRatio, Qt::SmoothTransformation), 6));
                                 } else {
                                     state->ui->labelConfigFlag->setPixmap(QPixmap());
                                 }

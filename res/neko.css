@@ -145,12 +145,14 @@ QLineEdit:focus {
 /* Menus */
 QMenu {
     background-color: palette(window);
+    color: palette(text);
     border: 1px solid #7a7a85;
     padding: 4px;
     border-radius: 4px;
 }
 
 QMenu::item {
+    color: palette(text);
     padding: 6px 24px;
     border-radius: 4px;
     margin: 2px;
@@ -159,6 +161,21 @@ QMenu::item {
 QMenu::item:selected {
     background-color: rgba(128, 128, 128, 0.3);
     color: #89b4fa;
+}
+
+/* ComboBox Dropdown */
+QComboBox QAbstractItemView {
+    background-color: palette(window);
+    color: palette(text);
+    border: 1px solid #7a7a85;
+    border-radius: 4px;
+    selection-background-color: rgba(137, 180, 250, 0.3);
+    selection-color: palette(text);
+}
+
+QComboBox {
+    color: palette(text);
+    background-color: palette(button);
 }
 
 /* Removed hover as selected handles it in Qt */
