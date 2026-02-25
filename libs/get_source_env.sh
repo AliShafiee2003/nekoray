@@ -5,5 +5,7 @@ fi
 
 if [ ! -z $ENV_SING_BOX_EXTRA ]; then
   source libs/get_source_env.sh
-#  export COMMIT_LIBNEKO="a26f0dbb1467bd181f76e2560e956633d9637e9d"
+  export COMMIT_SING_BOX="f63091d14d8984d53dc9a5563cb72af978b9779e"
+  export COMMIT_SING_QUIC="0bf1f198770e7c0948df48c0f12aab5ff32032df"
+  export COMMIT_LIBNEKO="5277a5bfc889ee7a89462695b0e678c1bd4909b1"
 fi
