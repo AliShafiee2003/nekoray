@@ -301,6 +301,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->menu_delete_repeat->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/trash.svg", text_color));
     ui->menu_clear_test_result->setIcon(Utils_ColorizeSvgIcon(":/neko/icon/clear.svg", text_color));
     
+    actionsMenu->addAction(ui->menu_remove_unavailable);
     actionsMenu->addAction(ui->menu_delete_repeat);
     actionsMenu->addAction(ui->menu_clear_test_result);
     actionsMenu->addSeparator();
