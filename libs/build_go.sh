@@ -33,9 +33,6 @@ go build -v -o $DEST -trimpath -ldflags "-w -s -X $neko_common.Version_v2ray=$Ve
 popd
 
 #### Go: nekobox_core ####
-export GONOSUMDB="github.com/sagernet/*"
-export GONOPROXY="github.com/sagernet/*"
-export GONOSUMCHECK="github.com/sagernet/*"
 pushd go/cmd/nekobox_core
-go build -mod=vendor -v -o $DEST -trimpath -ldflags "-w -s -X $neko_common.Version_neko=$version_standalone" -tags "with_clash_api,with_gvisor,with_quic,with_wireguard,with_utls"
+go build -v -o $DEST -trimpath -ldflags "-w -s -X $neko_common.Version_neko=$version_standalone" -tags "with_clash_api,with_gvisor,with_quic,with_wireguard,with_utls,with_ech"
 popd
