@@ -1,0 +1,8 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  myproto.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\Release\myproto.lib
+  Automatic MOC for target qhotkey
+  qhotkey.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\3rdparty\QHotkey\Release\qhotkey.lib
+  quickjs.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\3rdparty\qjs\Release\quickjs.lib
+  Automatic MOC and UIC for target nekoray
+  nekoray.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\Release\nekoray.exe

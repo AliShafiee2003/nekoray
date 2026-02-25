@@ -1,0 +1,19 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  myproto.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\Release\myproto.lib
+  Automatic MOC for target qhotkey
+  qhotkey.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\3rdparty\QHotkey\Release\qhotkey.lib
+  quickjs.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\3rdparty\qjs\Release\quickjs.lib
+  Automatic MOC and UIC for target nekoray
+  mainwindow.cpp
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\widget\MyTableWidget.h(93,54): warning C4996: 'QDropEvent::pos': Use position().toPoint() [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+  (compiling source file '../ui/mainwindow.cpp')
+  
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(796,41): warning C4996: 'QMessageBox::warning': Use the overload taking StandardButtons instead. [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(1344,29): warning C4996: 'QMessageBox::information': Use the overload taking StandardButtons instead. [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+  mainwindow_grpc.cpp
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\widget\MyTableWidget.h(93,54): warning C4996: 'QDropEvent::pos': Use position().toPoint() [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+  (compiling source file '../ui/mainwindow_grpc.cpp')
+  
+  Generating Code...
+LINK : fatal error LNK1104: cannot open file 'C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\Release\nekoray.exe' [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]

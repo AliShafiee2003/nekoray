@@ -1,0 +1,41 @@
+MSBuild version 17.14.40+3e7442088 for .NET Framework
+
+  myproto.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\Release\myproto.lib
+  Automatic MOC for target qhotkey
+  qhotkey.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\3rdparty\QHotkey\Release\qhotkey.lib
+  quickjs.vcxproj -> C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\3rdparty\qjs\Release\quickjs.lib
+  Automatic MOC and UIC for target nekoray
+  mainwindow.cpp
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\widget\MyTableWidget.h(93,54): warning C4996: 'QDropEvent::pos': Use position().toPoint() [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+  (compiling source file '../ui/mainwindow.cpp')
+  
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(132,17): error C2039: 'btnPingActive': is not a member of 'Ui::MainWindow' [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+      C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray_autogen\include_Release\ui_mainwindow.h(718,11):
+      see declaration of 'Ui::MainWindow'
+  
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(795,41): warning C4996: 'QMessageBox::warning': Use the overload taking StandardButtons instead. [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(985,35): error C2039: 'configDetailPanel': is not a member of 'Ui::MainWindow' [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+      C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray_autogen\include_Release\ui_mainwindow.h(718,11):
+      see declaration of 'Ui::MainWindow'
+  
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(986,13): error C2039: 'configDetailPanel': is not a member of 'Ui::MainWindow' [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+      C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray_autogen\include_Release\ui_mainwindow.h(718,11):
+      see declaration of 'Ui::MainWindow'
+  
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(987,13): error C2039: 'labelConfigName': is not a member of 'Ui::MainWindow' [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+      C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray_autogen\include_Release\ui_mainwindow.h(718,11):
+      see declaration of 'Ui::MainWindow'
+  
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(988,13): error C2039: 'labelConfigAddress': is not a member of 'Ui::MainWindow' [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+      C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray_autogen\include_Release\ui_mainwindow.h(718,11):
+      see declaration of 'Ui::MainWindow'
+  
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(989,13): error C2039: 'labelConfigType': is not a member of 'Ui::MainWindow' [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+      C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray_autogen\include_Release\ui_mainwindow.h(718,11):
+      see declaration of 'Ui::MainWindow'
+  
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(990,13): error C2039: 'labelConfigTraffic': is not a member of 'Ui::MainWindow' [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
+      C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray_autogen\include_Release\ui_mainwindow.h(718,11):
+      see declaration of 'Ui::MainWindow'
+  
+C:\Users\alish\Desktop\nekoray\nekoray-3.26\ui\mainwindow.cpp(1320,29): warning C4996: 'QMessageBox::information': Use the overload taking StandardButtons instead. [C:\Users\alish\Desktop\nekoray\nekoray-3.26\build\nekoray.vcxproj]
