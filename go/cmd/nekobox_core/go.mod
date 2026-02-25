@@ -4,7 +4,6 @@ go 1.24.1
 
 require (
 	github.com/matsuridayo/libneko v1.0.0 // replaced
-	github.com/sagernet/sing-box v1.0.0 // replaced
 	// github.com/sagernet/sing-dns v1.0.0 // indirect; replaced
 	grpc_server v1.0.0
 )
