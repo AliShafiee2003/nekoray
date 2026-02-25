@@ -71,11 +71,6 @@ func Updater() {
 	os.RemoveAll("./nekoray_update")
 	os.RemoveAll("./nekoray.zip")
 	os.RemoveAll("./nekoray.tar.gz")
-
-	// nekoray -> nekobox
-	os.Remove("./nekoray.exe")
-	os.Remove("./nekoray.png")
-	os.Remove("./nekoray_core.exe")
 }
 
 func Exist(path string) bool {

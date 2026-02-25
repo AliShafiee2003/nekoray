@@ -237,6 +237,7 @@ namespace NekoGui {
         _add(new configItem("current_group", &current_group, itemType::integer));
         _add(new configItem("inbound_address", &inbound_address, itemType::string));
         _add(new configItem("inbound_socks_port", &inbound_socks_port, itemType::integer));
+        _add(new configItem("inbound_http_port", &inbound_http_port, itemType::integer));
         _add(new configItem("log_level", &log_level, itemType::string));
         _add(new configItem("mux_protocol", &mux_protocol, itemType::string));
         _add(new configItem("mux_concurrency", &mux_concurrency, itemType::integer));
@@ -247,6 +248,7 @@ namespace NekoGui {
         _add(new configItem("theme", &theme, itemType::string));
         _add(new configItem("custom_inbound", &custom_inbound, itemType::string));
         _add(new configItem("custom_route", &custom_route_global, itemType::string));
+        _add(new configItem("v2ray_asset_dir", &v2ray_asset_dir, itemType::string));
         _add(new configItem("sub_use_proxy", &sub_use_proxy, itemType::boolean));
         _add(new configItem("remember_id", &remember_id, itemType::integer));
         _add(new configItem("remember_enable", &remember_enable, itemType::boolean));
@@ -274,6 +276,7 @@ namespace NekoGui {
         _add(new configItem("sub_clear", &sub_clear, itemType::boolean));
         _add(new configItem("sub_insecure", &sub_insecure, itemType::boolean));
         _add(new configItem("sub_auto_update", &sub_auto_update, itemType::integer));
+        _add(new configItem("enable_js_hook", &enable_js_hook, itemType::integer));
         _add(new configItem("log_ignore", &log_ignore, itemType::stringList));
         _add(new configItem("start_minimal", &start_minimal, itemType::boolean));
         _add(new configItem("max_log_line", &max_log_line, itemType::integer));
@@ -282,7 +285,12 @@ namespace NekoGui {
         _add(new configItem("core_box_clash_api", &core_box_clash_api, itemType::integer));
         _add(new configItem("core_box_clash_api_secret", &core_box_clash_api_secret, itemType::string));
         _add(new configItem("core_box_underlying_dns", &core_box_underlying_dns, itemType::string));
+        _add(new configItem("core_ray_direct_dns", &core_ray_direct_dns, itemType::boolean));
+        _add(new configItem("core_ray_freedom_domainStrategy", &core_ray_freedom_domainStrategy, itemType::string));
         _add(new configItem("vpn_internal_tun", &vpn_internal_tun, itemType::boolean));
+#ifdef Q_OS_WIN
+        _add(new configItem("core_ray_windows_disable_auto_interface", &core_ray_windows_disable_auto_interface, itemType::boolean));
+#endif
     }
 
     void DataStore::UpdateStartedId(int id) {
@@ -303,7 +311,11 @@ namespace NekoGui {
         if (isDefault) {
             QString version = SubStrBefore(NKR_VERSION, "-");
             if (!version.contains(".")) version = "2.0";
-            return "NekoBox/PC/" + version + " (Prefer ClashMeta Format)";
+            if (IS_NEKO_BOX) {
+                return "NekoBox/PC/" + version + " (Prefer ClashMeta Format)";
+            } else {
+                return "NekoRay/PC/" + version + " (Prefer ClashMeta Format)";
+            }
         }
         return user_agent;
     }
@@ -324,8 +336,10 @@ namespace NekoGui {
                 "domain:firebase.io\n"
                 "domain:crashlytics.com\n";
         }
-        if (!Preset::SingBox::DomainStrategy.contains(domain_strategy)) domain_strategy = "";
-        if (!Preset::SingBox::DomainStrategy.contains(outbound_domain_strategy)) outbound_domain_strategy = "";
+        if (IS_NEKO_BOX) {
+            if (!Preset::SingBox::DomainStrategy.contains(domain_strategy)) domain_strategy = "";
+            if (!Preset::SingBox::DomainStrategy.contains(outbound_domain_strategy)) outbound_domain_strategy = "";
+        }
         _add(new configItem("direct_ip", &this->direct_ip, itemType::string));
         _add(new configItem("direct_domain", &this->direct_domain, itemType::string));
         _add(new configItem("proxy_ip", &this->proxy_ip, itemType::string));
@@ -349,7 +363,7 @@ namespace NekoGui {
     }
 
     QString Routing::DisplayRouting() const {
-        return QStringLiteral("[Proxy] %1\n[Proxy] %2\n[Direct] %3\n[Direct] %4\n[Block] %5\n[Block] %6\n[Default Outbound] %7\n[DNS] %8")
+        return QString("[Proxy] %1\n[Proxy] %2\n[Direct] %3\n[Direct] %4\n[Block] %5\n[Block] %6\n[Default Outbound] %7\n[DNS] %8")
             .arg(SplitLinesSkipSharp(proxy_domain).join(","), 10)
             .arg(SplitLinesSkipSharp(proxy_ip).join(","), 10)
             .arg(SplitLinesSkipSharp(direct_domain).join(","), 10)
@@ -415,13 +429,16 @@ namespace NekoGui {
     // System Utils
 
     QString FindCoreAsset(const QString &name) {
-        QStringList search{};
+        QStringList search{NekoGui::dataStore->v2ray_asset_dir};
         search << QApplication::applicationDirPath();
         search << "/usr/share/sing-geoip";
         search << "/usr/share/sing-geosite";
-        search << "/usr/share/sing-box";
-        search << "/usr/lib/nekobox";
-        search << "/usr/share/nekobox";
+        search << "/usr/share/xray";
+        search << "/usr/local/share/xray";
+        search << "/opt/xray";
+        search << "/usr/share/v2ray";
+        search << "/usr/local/share/v2ray";
+        search << "/opt/v2ray";
         for (const auto &dir: search) {
             if (dir.isEmpty()) continue;
             QFileInfo asset(dir + "/" + name);

@@ -18,7 +18,7 @@ namespace NekoGui_network {
         if (NekoGui::dataStore->sub_use_proxy) {
             QNetworkProxy p;
             // Note: sing-box mixed socks5 protocol error
-            p.setType(QNetworkProxy::HttpProxy);
+            p.setType(IS_NEKO_BOX ? QNetworkProxy::HttpProxy : QNetworkProxy::Socks5Proxy);
             p.setHostName("127.0.0.1");
             p.setPort(NekoGui::dataStore->inbound_socks_port);
             if (NekoGui::dataStore->inbound_auth->NeedAuth()) {
@@ -51,7 +51,7 @@ namespace NekoGui_network {
             for (const auto &err: errors) {
                 error_str << err.errorString();
             }
-            MW_show_log(QStringLiteral("SSL Errors: %1 %2").arg(error_str.join(","), NekoGui::dataStore->sub_insecure ? "(Ignored)" : ""));
+            MW_show_log(QString("SSL Errors: %1 %2").arg(error_str.join(","), NekoGui::dataStore->sub_insecure ? "(Ignored)" : ""));
         });
         // Wait for response
         auto abortTimer = new QTimer;

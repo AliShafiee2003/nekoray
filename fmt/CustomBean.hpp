@@ -24,7 +24,7 @@ namespace NekoGui_fmt {
         QString DisplayType() override {
             if (core == "internal") {
                 auto obj = QString2QJsonObject(config_simple);
-                return obj["type"].toString();
+                return obj[IS_NEKO_BOX ? "type" : "protocol"].toString();
             } else if (core == "internal-full") {
                 return software_core_name + " config";
             }
@@ -36,7 +36,11 @@ namespace NekoGui_fmt {
         QString DisplayAddress() override {
             if (core == "internal") {
                 auto obj = QString2QJsonObject(config_simple);
-                return ::DisplayAddress(obj["server"].toString(), obj["server_port"].toInt());
+                if (IS_NEKO_BOX) {
+                    return ::DisplayAddress(obj["server"].toString(), obj["server_port"].toInt());
+                } else {
+                    return {};
+                }
             } else if (core == "internal-full") {
                 return {};
             }
@@ -48,5 +52,7 @@ namespace NekoGui_fmt {
         ExternalBuildResult BuildExternal(int mapping_port, int socks_port, int external_stat) override;
 
         CoreObjOutboundBuildResult BuildCoreObjSingBox() override;
+
+        CoreObjOutboundBuildResult BuildCoreObjV2Ray() override;
     };
 } // namespace NekoGui_fmt

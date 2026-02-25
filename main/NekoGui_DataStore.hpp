@@ -14,9 +14,9 @@ namespace NekoGui {
         QString custom = "{\"rules\": []}";
 
         // DNS
-        QString remote_dns = "https://dns.google/dns-query";
+        QString remote_dns = "https://8.8.8.8/dns-query";
         QString remote_dns_strategy = "";
-        QString direct_dns = "https://doh.pub/dns-query";
+        QString direct_dns = "localhost";
         QString direct_dns_strategy = "";
         bool dns_routing = true;
         bool use_dns_object = false;
@@ -93,7 +93,7 @@ namespace NekoGui {
         // Saved
 
         // Misc
-        QString log_level = "info";
+        QString log_level = "warning";
         QString test_latency_url = "http://cp.cloudflare.com/";
         QString test_download_url = "http://cachefly.cachefly.net/10mb.test";
         int test_download_timeout = 30;
@@ -102,11 +102,12 @@ namespace NekoGui {
         int traffic_loop_interval = 1000;
         bool connection_statistics = false;
         int current_group = 0; // group id
-        QString mux_protocol = "h2mux";
+        QString mux_protocol = "";
         bool mux_padding = false;
         int mux_concurrency = 8;
         bool mux_default_on = false;
         QString theme = "0";
+        QString v2ray_asset_dir = "";
         int language = 0;
         QString mw_size = "";
         bool check_include_pre = false;
@@ -125,6 +126,7 @@ namespace NekoGui {
 
         // Security
         bool skip_cert = false;
+        int enable_js_hook = 0;
         QString utlsFingerprint = "";
 
         // Remember
@@ -165,6 +167,8 @@ namespace NekoGui {
         int core_box_clash_api = -9090;
         QString core_box_clash_api_secret = "";
         QString core_box_underlying_dns = "";
+        bool core_ray_direct_dns = false;
+        bool core_ray_windows_disable_auto_interface = false;
         QString core_ray_freedom_domainStrategy = "";
 
         // Other Core
